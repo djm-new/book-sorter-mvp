@@ -197,7 +197,6 @@
       border-radius: 18px;
       overflow: hidden;
       background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(7, 11, 22, 0.95));
-      aspect-ratio: 3 / 4;
       box-shadow: var(--shadow);
       touch-action: manipulation;
       user-select: none;
@@ -210,8 +209,9 @@
     .card img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
+      background: rgba(3, 7, 18, 0.92);
     }
 
     .overlay {
@@ -512,24 +512,24 @@
     // Tight demo crops for the bundled sample photo so the gallery shows
     // each individual book instead of the whole floor shot.
     const DEMO_BOOK_SPECS = [
-      { title: "Fun Crafts for Kids", x: 118, y: 176, w: 184, h: 192, rotation: 90 },
-      { title: "Paper", x: 335, y: 86, w: 208, h: 186, rotation: 90 },
-      { title: "The Hardest Hidden Pictures Book Ever", x: 572, y: 28, w: 258, h: 224, rotation: 0 },
-      { title: "Elibird Activities", x: 82, y: 332, w: 250, h: 214, rotation: 0 },
-      { title: "Paper Mache", x: 300, y: 276, w: 236, h: 238, rotation: 0 },
-      { title: "My First Big Book of Activities", x: 540, y: 232, w: 270, h: 250, rotation: 0 },
-      { title: "Travel Puzzles", x: 94, y: 506, w: 212, h: 224, rotation: 0 },
-      { title: "Fun with Learning Numbers", x: 310, y: 512, w: 230, h: 236, rotation: 0 },
-      { title: "Summer Seuss Grades 1 & 2", x: 535, y: 500, w: 265, h: 254, rotation: 0 },
-      { title: "Reading Skills", x: 92, y: 760, w: 198, h: 236, rotation: 0 },
-      { title: "Big Preschool ABC 1 2 3", x: 92, y: 936, w: 214, h: 192, rotation: 0 },
-      { title: "ABC", x: 325, y: 748, w: 232, h: 222, rotation: 0 },
-      { title: "Everyday Math", x: 564, y: 748, w: 250, h: 228, rotation: 0 },
-      { title: "My Stem Day Science", x: 54, y: 1087, w: 224, h: 164, rotation: 0 },
-      { title: "Numbers", x: 324, y: 965, w: 214, h: 202, rotation: 0 },
-      { title: "Numbers", x: 334, y: 1092, w: 210, h: 164, rotation: 0 },
-      { title: "Little Learn First Words Alphabet", x: 576, y: 907, w: 258, h: 238, rotation: 0 },
-      { title: "How many frogs?", x: 662, y: 1100, w: 206, h: 174, rotation: 0 },
+      { title: "Fun Crafts for Kids", x: 108, y: 165, w: 188, h: 206, rotation: 90, pad: 4 },
+      { title: "Paper", x: 335, y: 72, w: 190, h: 220, rotation: 90, pad: 4 },
+      { title: "The Hardest Hidden Pictures Book Ever", x: 590, y: 24, w: 232, h: 214, rotation: 0, pad: 4 },
+      { title: "Elibird Activities", x: 74, y: 325, w: 238, h: 214, rotation: 0, pad: 4 },
+      { title: "Paper Mache", x: 315, y: 269, w: 230, h: 232, rotation: 0, pad: 4 },
+      { title: "My First Big Book of Activities", x: 563, y: 226, w: 246, h: 256, rotation: 0, pad: 4 },
+      { title: "Travel Puzzles", x: 76, y: 546, w: 232, h: 230, rotation: 0, pad: 4 },
+      { title: "Fun with Learning Numbers", x: 326, y: 544, w: 222, h: 232, rotation: 0, pad: 4 },
+      { title: "Summer Seuss Grades 1 & 2", x: 552, y: 532, w: 255, h: 252, rotation: 0, pad: 4 },
+      { title: "Reading Skills", x: 68, y: 800, w: 214, h: 226, rotation: 0, pad: 4 },
+      { title: "ABC", x: 326, y: 805, w: 222, h: 218, rotation: 0, pad: 4 },
+      { title: "Everyday Math", x: 556, y: 794, w: 260, h: 230, rotation: 0, pad: 4 },
+      { title: "Big Preschool ABC 1 2 3", x: 66, y: 987, w: 226, h: 214, rotation: 0, pad: 4 },
+      { title: "Numbers", x: 326, y: 975, w: 218, h: 214, rotation: 0, pad: 4 },
+      { title: "Little Learn First Words Alphabet", x: 572, y: 990, w: 248, h: 236, rotation: 0, pad: 4 },
+      { title: "My Stem Day Science", x: 56, y: 1120, w: 218, h: 160, rotation: 0, pad: 4 },
+      { title: "Numbers", x: 328, y: 1110, w: 218, h: 160, rotation: 0, pad: 4 },
+      { title: "How many frogs?", x: 582, y: 1120, w: 220, h: 160, rotation: 0, pad: 4 },
     ];
 
     const state = {
@@ -612,6 +612,9 @@
         const card = document.createElement("article");
         card.className = `card ${group.decision || "blank"}`;
         card.dataset.id = String(group.id);
+        if (group.aspectRatio) {
+          card.style.aspectRatio = String(group.aspectRatio);
+        }
 
         const img = document.createElement("img");
         img.src = group.crop;
@@ -847,7 +850,7 @@
     }
 
     function cropRotatedRegion(canvas, spec) {
-      const pad = Math.max(10, Math.round(Math.max(spec.w, spec.h) * 0.08));
+      const pad = spec.pad ?? Math.max(4, Math.round(Math.max(spec.w, spec.h) * 0.03));
       const cropX = Math.max(0, Math.round(spec.x - pad));
       const cropY = Math.max(0, Math.round(spec.y - pad));
       const cropW = Math.min(canvas.width - cropX, Math.round(spec.w + pad * 2));
@@ -881,6 +884,7 @@
           id: idx + 1,
           hash,
           crop: crop.toDataURL("image/jpeg", 0.9),
+          aspectRatio: crop.width / crop.height,
           count: 1,
           sourceLabels: ["demo photo"],
           category,
@@ -1196,6 +1200,7 @@
           id: 0,
           hash,
           crop: cropUrl,
+          aspectRatio: stats.crop.width / stats.crop.height,
           count: 1,
           sourceLabels: [label],
           category,

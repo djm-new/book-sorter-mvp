@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Book Sorter</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: rgba(17, 24, 39, 0.92);
+      --panel-2: rgba(24, 31, 52, 0.94);
+      --line: rgba(255, 255, 255, 0.12);
+      --muted: rgba(229, 231, 235, 0.72);
+      --text: #f8fafc;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #38bdf8;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.12), transparent 36%),
+        linear-gradient(180deg, #050816 0%, var(--bg) 100%);
+      color: var(--text);
+      overscroll-behavior: none;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shell {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 16px 12px 28px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(180deg, rgba(5, 8, 22, 0.96), rgba(5, 8, 22, 0.78));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .topbar-inner {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 14px 12px 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      max-width: 72ch;
+      font-size: 0.95rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .pill strong { font-size: 0.95rem; }
+    .pill small { color: var(--muted); font-size: 0.82rem; }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-weight: 650;
+      box-shadow: var(--shadow);
+    }
+
+    .btn.primary {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.28), rgba(14, 165, 233, 0.18));
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .btn.ghost {
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .status {
+      min-height: 1.25rem;
+      font-size: 0.93rem;
+      color: var(--muted);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.94), rgba(9, 14, 28, 0.94));
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat .value {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.45rem;
+      font-weight: 750;
+    }
+
+    .board {
+      margin-top: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+      gap: 10px;
+      align-items: start;
+    }
+
+    .card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(7, 11, 22, 0.95));
+      aspect-ratio: 3 / 4;
+      box-shadow: var(--shadow);
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .card.blank { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), var(--shadow); }
+    .card.keep { box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.38), var(--shadow); }
+    .card.discard { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.42), var(--shadow); }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      font-size: clamp(4rem, 12vw, 6rem);
+      font-weight: 900;
+      opacity: 0.9;
+      text-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .overlay.keep { color: var(--green); background: rgba(34, 197, 94, 0.08); }
+    .overlay.discard { color: var(--red); background: rgba(239, 68, 68, 0.08); }
+
+    .card-labels {
+      position: absolute;
+      inset: 8px 8px auto 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: calc(100% - 36px);
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.74rem;
+      line-height: 1;
+      text-transform: capitalize;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chip.suggestion { color: #dbeafe; }
+    .chip.count { color: #fde68a; }
+
+    .decision-row {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .icon-btn {
+      pointer-events: auto;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .icon-btn.keep { background: rgba(34, 197, 94, 0.95); }
+    .icon-btn.discard { background: rgba(239, 68, 68, 0.95); }
+
+    .empty-state, .hint-box {
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.45);
+      color: var(--muted);
+    }
+
+    .hint-box strong { color: var(--text); }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(2, 6, 23, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(100%, 720px);
+      max-height: min(92vh, 980px);
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(8, 13, 24, 0.98));
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .modal-head .sub {
+      margin-top: 2px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.88);
+      color: var(--text);
+      font-size: 1.2rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .modal-body {
+      overflow: auto;
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal-image {
+      width: 100%;
+      max-height: 58vh;
+      object-fit: contain;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(2, 6, 23, 0.55);
+    }
+
+    .category-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .category-btn {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 8px;
+      background: rgba(15, 23, 42, 0.65);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .category-btn.active.keep { border-color: rgba(34, 197, 94, 0.55); background: rgba(34, 197, 94, 0.16); }
+    .category-btn.active.discard { border-color: rgba(239, 68, 68, 0.55); background: rgba(239, 68, 68, 0.16); }
+    .category-btn.active { border-color: rgba(56, 189, 248, 0.55); background: rgba(56, 189, 248, 0.16); }
+
+    .modal-footer {
+      padding: 14px 16px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .footer-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    @media (max-width: 700px) {
+      .summary { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; }
+      .pill-row { justify-content: flex-start; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+      .category-row { grid-template-columns: 1fr; }
+      .modal { border-radius: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="hero">
+          <div class="title-wrap">
+            <h1>Book Sorter</h1>
+            <p>Scan one or more floor photos, auto-isolate each book into a gallery tile, and tap the green check or red X. Duplicates stay linked so one decision applies to every copy.</p>
+          </div>
+          <div class="pill-row">
+            <div class="pill"><strong id="totalCount">0</strong><small>detected</small></div>
+            <div class="pill"><strong id="keepCount">0</strong><small>keep</small></div>
+            <div class="pill"><strong id="discardCount">0</strong><small>discard</small></div>
+            <div class="pill"><strong id="blankCount">0</strong><small>undecided</small></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="button-row">
+            <label class="btn primary" for="fileInput">Upload photos</label>
+            <input class="sr-only" id="fileInput" type="file" accept="image/*" multiple />
+            <button class="btn" id="demoBtn" type="button">Load demo photo</button>
+            <button class="btn ghost" id="clearBtn" type="button">Clear decisions</button>
+            <button class="btn ghost" id="exportJsonBtn" type="button">Export JSON</button>
+            <button class="btn ghost" id="exportTextBtn" type="button">Copy keep/discard list</button>
+          </div>
+          <div class="status" id="status">Ready. Load the sample photo or upload your own.</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <div class="summary" aria-label="Summary cards">
+        <div class="stat"><span class="label">All detected books</span><span class="value" id="statTotal">0</span></div>
+        <div class="stat"><span class="label">Marked keep</span><span class="value" id="statKeep">0</span></div>
+        <div class="stat"><span class="label">Marked discard</span><span class="value" id="statDiscard">0</span></div>
+      </div>
+
+      <section class="board">
+        <div class="hint-box">
+          <strong>How it works:</strong> take a wide floor photo, upload it, review the gallery, then tap the corner buttons. Tap the center of any tile to enlarge it. Category suggestions are automatic, but you can change them in the zoom view.
+        </div>
+
+        <div id="gallery" class="gallery"></div>
+        <div id="emptyState" class="empty-state">
+          No books detected yet. Upload a floor photo or load the demo image to get started.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Book preview">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle">Book preview</h2>
+          <div class="sub" id="modalSub">Tap keep or discard, or change the category suggestion.</div>
+        </div>
+        <button class="close-btn" id="closeModalBtn" type="button" aria-label="Close preview">×</button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" class="modal-image" alt="Selected book crop" />
+        <div class="category-row" id="categoryRow"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="footer-group">
+          <button class="btn" id="modalKeepBtn" type="button">Green check — keep</button>
+          <button class="btn" id="modalDiscardBtn" type="button">Red X — discard</button>
+        </div>
+        <div class="footer-group">
+          <button class="btn ghost" id="modalBlankBtn" type="button">Blank — undecided</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="workCanvas" class="sr-only"></canvas>
+  <script>
+    const CATEGORY_ORDER = ["coloring", "activity", "sticker"];
+    const STORAGE_KEY = "hermes-book-sorter-decisions-v1";
+    const CATEGORY_LABELS = {
+      coloring: "Coloring",
+      activity: "Activity",
+      sticker: "Sticker",
+    };
+
+    const state = {
+      groups: [],
+      nextId: 1,
+      selectedId: null,
+      storage: loadStorage(),
+      busy: false,
+    };
+
+    const els = {
+      gallery: document.getElementById("gallery"),
+      emptyState: document.getElementById("emptyState"),
+      fileInput: document.getElementById("fileInput"),
+      demoBtn: document.getElementById("demoBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      exportJsonBtn: document.getElementById("exportJsonBtn"),
+      exportTextBtn: document.getElementById("exportTextBtn"),
+      status: document.getElementById("status"),
+      totalCount: document.getElementById("totalCount"),
+      keepCount: document.getElementById("keepCount"),
+      discardCount: document.getElementById("discardCount"),
+      blankCount: document.getElementById("blankCount"),
+      statTotal: document.getElementById("statTotal"),
+      statKeep: document.getElementById("statKeep"),
+      statDiscard: document.getElementById("statDiscard"),
+      modalBackdrop: document.getElementById("modalBackdrop"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalSub: document.getElementById("modalSub"),
+      modalImage: document.getElementById("modalImage"),
+      categoryRow: document.getElementById("categoryRow"),
+      modalKeepBtn: document.getElementById("modalKeepBtn"),
+      modalDiscardBtn: document.getElementById("modalDiscardBtn"),
+      modalBlankBtn: document.getElementById("modalBlankBtn"),
+      closeModalBtn: document.getElementById("closeModalBtn"),
+      workCanvas: document.getElementById("workCanvas"),
+    };
+
+    const workCtx = els.workCanvas.getContext("2d", { willReadFrequently: true });
+
+    function loadStorage() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.storage));
+    }
+
+    function setStatus(message) {
+      els.status.textContent = message;
+    }
+
+    function countByDecision(decision) {
+      return state.groups.filter((g) => g.decision === decision).length;
+    }
+
+    function renderSummary() {
+      els.totalCount.textContent = String(state.groups.length);
+      els.keepCount.textContent = String(countByDecision("keep"));
+      els.discardCount.textContent = String(countByDecision("discard"));
+      els.blankCount.textContent = String(countByDecision(null));
+      els.statTotal.textContent = String(state.groups.length);
+      els.statKeep.textContent = String(countByDecision("keep"));
+      els.statDiscard.textContent = String(countByDecision("discard"));
+      els.emptyState.style.display = state.groups.length ? "none" : "block";
+    }
+
+    function formatGroupLabel(group) {
+      const name = `Book ${String(group.id).padStart(2, "0")}`;
+      return group.count > 1 ? `${name} ×${group.count}` : name;
+    }
+
+    function renderGallery() {
+      els.gallery.innerHTML = "";
+      for (const group of state.groups) {
+        const card = document.createElement("article");
+        card.className = `card ${group.decision || "blank"}`;
+        card.dataset.id = String(group.id);
+
+        const img = document.createElement("img");
+        img.src = group.crop;
+        img.alt = formatGroupLabel(group);
+        card.appendChild(img);
+
+        const labels = document.createElement("div");
+        labels.className = "card-labels";
+
+        const category = document.createElement("div");
+        category.className = "chip suggestion";
+        category.textContent = group.categoryLabel;
+        category.title = "Tap to cycle the category";
+        category.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          cycleCategory(group.id);
+        });
+        labels.appendChild(category);
+
+        if (group.count > 1) {
+          const count = document.createElement("div");
+          count.className = "chip count";
+          count.textContent = `×${group.count}`;
+          labels.appendChild(count);
+        }
+
+        card.appendChild(labels);
+
+        if (group.decision === "keep" || group.decision === "discard") {
+          const overlay = document.createElement("div");
+          overlay.className = `overlay ${group.decision}`;
+          overlay.textContent = group.decision === "keep" ? "✓" : "✕";
+          card.appendChild(overlay);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "decision-row";
+
+        const keepBtn = document.createElement("button");
+        keepBtn.type = "button";
+        keepBtn.className = "icon-btn keep";
+        keepBtn.textContent = "✓";
+        keepBtn.setAttribute("aria-label", `Mark ${formatGroupLabel(group)} keep`);
+        keepBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          setDecision(group.id, "keep");
+        });
+
+        const discardBtn = document.createElement("button");
+        discardBtn.type = "button";
+        discardBtn.className = "icon-btn discard";
+        discardBtn.textContent = "✕";
+        discardBtn.setAttribute("aria-label", `Mark ${formatGroupLabel(group)} discard`);
+        discardBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          setDecision(group.id, "discard");
+        });
+
+        actions.appendChild(keepBtn);
+        actions.appendChild(discardBtn);
+        card.appendChild(actions);
+
+        card.addEventListener("click", () => openModal(group.id));
+        els.gallery.appendChild(card);
+      }
+      renderSummary();
+      renderModalActions();
+    }
+
+    function currentGroup() {
+      return state.groups.find((g) => g.id === state.selectedId) || null;
+    }
+
+    function openModal(id) {
+      state.selectedId = id;
+      const group = currentGroup();
+      if (!group) return;
+      els.modalTitle.textContent = formatGroupLabel(group);
+      els.modalSub.textContent = `${group.categoryLabel} · ${group.decision ? group.decision : "undecided"} · hash ${group.hash.slice(0, 10)}`;
+      els.modalImage.src = group.crop;
+      els.modalBackdrop.classList.add("open");
+      renderModalActions();
+    }
+
+    function closeModal() {
+      els.modalBackdrop.classList.remove("open");
+      state.selectedId = null;
+    }
+
+    function renderModalActions() {
+      els.categoryRow.innerHTML = "";
+      const group = currentGroup();
+      if (!group) return;
+      CATEGORY_ORDER.forEach((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `category-btn ${group.category === category ? "active" : ""}`;
+        button.textContent = CATEGORY_LABELS[category];
+        button.addEventListener("click", () => {
+          group.category = category;
+          group.categoryLabel = CATEGORY_LABELS[category];
+          persistGroup(group);
+          renderGallery();
+          openModal(group.id);
+        });
+        els.categoryRow.appendChild(button);
+      });
+
+      els.modalKeepBtn.onclick = () => setDecision(group.id, "keep");
+      els.modalDiscardBtn.onclick = () => setDecision(group.id, "discard");
+      els.modalBlankBtn.onclick = () => setDecision(group.id, null);
+    }
+
+    function persistGroup(group) {
+      state.storage[group.hash] = {
+        category: group.category,
+        decision: group.decision,
+      };
+      saveStorage();
+    }
+
+    function setDecision(id, decision) {
+      const group = state.groups.find((g) => g.id === id);
+      if (!group) return;
+      group.decision = decision;
+      persistGroup(group);
+      renderGallery();
+      if (state.selectedId === id) {
+        openModal(id);
+      }
+    }
+
+    function cycleCategory(id) {
+      const group = state.groups.find((g) => g.id === id);
+      if (!group) return;
+      const idx = CATEGORY_ORDER.indexOf(group.category);
+      const next = CATEGORY_ORDER[(idx + 1) % CATEGORY_ORDER.length];
+      group.category = next;
+      group.categoryLabel = CATEGORY_LABELS[next];
+      persistGroup(group);
+      renderGallery();
+      if (state.selectedId === id) openModal(id);
+    }
+
+    function clearDecisions() {
+      for (const group of state.groups) {
+        group.decision = null;
+        persistGroup(group);
+      }
+      renderGallery();
+      setStatus("Cleared keep/discard decisions.");
+    }
+
+    function exportData() {
+      return {
+        generatedAt: new Date().toISOString(),
+        total: state.groups.length,
+        keep: state.groups.filter((g) => g.decision === "keep").map(groupToJSON),
+        discard: state.groups.filter((g) => g.decision === "discard").map(groupToJSON),
+        undecided: state.groups.filter((g) => !g.decision).map(groupToJSON),
+      };
+    }
+
+    function groupToJSON(group) {
+      return {
+        id: group.id,
+        hash: group.hash,
+        label: formatGroupLabel(group),
+        category: group.category,
+        decision: group.decision,
+        count: group.count,
+      };
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(exportData(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url, "book-sorter-results.json");
+    }
+
+    async function copyTextList() {
+      const data = exportData();
+      const lines = [];
+      const writeSection = (name, items) => {
+        lines.push(`${name} (${items.length})`);
+        for (const item of items) {
+          lines.push(`- ${item.label} — ${item.category}` + (item.count > 1 ? ` — x${item.count}` : ""));
+        }
+        lines.push("");
+      };
+      writeSection("Keep", data.keep);
+      writeSection("Discard", data.discard);
+      writeSection("Undecided", data.undecided);
+      await navigator.clipboard.writeText(lines.join("\n").trim() + "\n");
+      setStatus("Copied keep/discard list to clipboard.");
+    }
+
+    function triggerDownload(url, filename) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function imageToCanvas(img, maxSide = 1500) {
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+      canvas.width = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
+      canvas.height = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      return canvas;
+    }
+
+    function getPixels(canvas) {
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      return ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    function estimateBackground(data, width, height) {
+      let r = 0, g = 0, b = 0, n = 0;
+      const border = Math.max(4, Math.round(Math.min(width, height) * 0.02));
+      const add = (idx) => {
+        r += data[idx];
+        g += data[idx + 1];
+        b += data[idx + 2];
+        n += 1;
+      };
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          if (x >= border && x < width - border && y >= border && y < height - border) continue;
+          add((y * width + x) * 4);
+        }
+      }
+      return { r: r / n, g: g / n, b: b / n };
+    }
+
+    function rgbDistanceSq(r1, g1, b1, r2, g2, b2) {
+      const dr = r1 - r2;
+      const dg = g1 - g2;
+      const db = b1 - b2;
+      return dr * dr + dg * dg + db * db;
+    }
+
+    function saturation(r, g, b) {
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      return max === 0 ? 0 : ((max - min) / max) * 255;
+    }
+
+    function createBinaryMask(canvas) {
+      const { data, width, height } = getPixels(canvas);
+      const bg = estimateBackground(data, width, height);
+      const mask = new Uint8Array(width * height);
+      const threshold = 38 * 38;
+      const satThreshold = 52;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const dist = rgbDistanceSq(r, g, b, bg.r, bg.g, bg.b);
+          const sat = saturation(r, g, b);
+          const bright = (r + g + b) / 3;
+          const foreground = dist > threshold || sat > satThreshold || bright < 42;
+          mask[y * width + x] = foreground ? 1 : 0;
+        }
+      }
+      return { mask, width, height };
+    }
+
+    function dilate(mask, width, height, radius = 1) {
+      const out = new Uint8Array(width * height);
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let hit = 0;
+          for (let dy = -radius; dy <= radius && !hit; dy++) {
+            const ny = y + dy;
+            if (ny < 0 || ny >= height) continue;
+            for (let dx = -radius; dx <= radius; dx++) {
+              const nx = x + dx;
+              if (nx < 0 || nx >= width) continue;
+              if (mask[ny * width + nx]) { hit = 1; break; }
+            }
+          }
+          out[y * width + x] = hit;
+        }
+      }
+      return out;
+    }
+
+    function erode(mask, width, height, radius = 1) {
+      const out = new Uint8Array(width * height);
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let ok = 1;
+          for (let dy = -radius; dy <= radius && ok; dy++) {
+            const ny = y + dy;
+            if (ny < 0 || ny >= height) { ok = 0; break; }
+            for (let dx = -radius; dx <= radius; dx++) {
+              const nx = x + dx;
+              if (nx < 0 || nx >= width || !mask[ny * width + nx]) { ok = 0; break; }
+            }
+          }
+          out[y * width + x] = ok;
+        }
+      }
+      return out;
+    }
+
+    function closeMask(mask, width, height) {
+      return erode(dilate(mask, width, height, 1), width, height, 1);
+    }
+
+    function findComponents(mask, width, height) {
+      const visited = new Uint8Array(width * height);
+      const components = [];
+      const stack = [];
+      const directions = [
+        [-1, -1], [0, -1], [1, -1],
+        [-1, 0],           [1, 0],
+        [-1, 1],  [0, 1],  [1, 1],
+      ];
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const start = y * width + x;
+          if (!mask[start] || visited[start]) continue;
+          let minX = x, minY = y, maxX = x, maxY = y, area = 0;
+          visited[start] = 1;
+          stack.push([x, y]);
+          while (stack.length) {
+            const [cx, cy] = stack.pop();
+            area += 1;
+            if (cx < minX) minX = cx;
+            if (cy < minY) minY = cy;
+            if (cx > maxX) maxX = cx;
+            if (cy > maxY) maxY = cy;
+            for (const [dx, dy] of directions) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+              const nidx = ny * width + nx;
+              if (mask[nidx] && !visited[nidx]) {
+                visited[nidx] = 1;
+                stack.push([nx, ny]);
+              }
+            }
+          }
+          components.push({ minX, minY, maxX, maxY, area });
+        }
+      }
+      return components;
+    }
+
+    function iou(a, b) {
+      const x1 = Math.max(a.minX, b.minX);
+      const y1 = Math.max(a.minY, b.minY);
+      const x2 = Math.min(a.maxX, b.maxX);
+      const y2 = Math.min(a.maxY, b.maxY);
+      const inter = Math.max(0, x2 - x1 + 1) * Math.max(0, y2 - y1 + 1);
+      const areaA = (a.maxX - a.minX + 1) * (a.maxY - a.minY + 1);
+      const areaB = (b.maxX - b.minX + 1) * (b.maxY - b.minY + 1);
+      return inter / Math.max(1, areaA + areaB - inter);
+    }
+
+    function dedupeBoxes(boxes) {
+      const kept = [];
+      for (const box of boxes.sort((a, b) => b.area - a.area)) {
+        let overlaps = false;
+        for (const existing of kept) {
+          if (iou(box, existing) > 0.68) {
+            overlaps = true;
+            break;
+          }
+        }
+        if (!overlaps) kept.push(box);
+      }
+      return kept.sort((a, b) => a.minY - b.minY || a.minX - b.minX);
+    }
+
+    function componentStats(canvas, box) {
+      const padding = 4;
+      const x = Math.max(0, box.minX - padding);
+      const y = Math.max(0, box.minY - padding);
+      const w = Math.min(canvas.width - x, box.maxX - box.minX + 1 + padding * 2);
+      const h = Math.min(canvas.height - y, box.maxY - box.minY + 1 + padding * 2);
+      const crop = document.createElement("canvas");
+      crop.width = Math.max(1, Math.round(w));
+      crop.height = Math.max(1, Math.round(h));
+      const ctx = crop.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(canvas, x, y, w, h, 0, 0, crop.width, crop.height);
+      const { data, width, height } = ctx.getImageData(0, 0, crop.width, crop.height);
+      let satSum = 0;
+      let brightSum = 0;
+      let whiteCount = 0;
+      let edgeCount = 0;
+      let colorful = 0;
+      const total = width * height;
+      for (let py = 0; py < height; py++) {
+        for (let px = 0; px < width; px++) {
+          const idx = (py * width + px) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const sat = saturation(r, g, b);
+          const bright = (r + g + b) / 3;
+          satSum += sat;
+          brightSum += bright;
+          if (bright > 190) whiteCount += 1;
+          if (sat > 72) colorful += 1;
+          if (px < width - 1 && py < height - 1) {
+            const idxRight = idx + 4;
+            const idxDown = idx + width * 4;
+            const diff = Math.abs(r - data[idxRight]) + Math.abs(g - data[idxRight + 1]) + Math.abs(b - data[idxRight + 2]) + Math.abs(r - data[idxDown]) + Math.abs(g - data[idxDown + 1]) + Math.abs(b - data[idxDown + 2]);
+            if (diff > 120) edgeCount += 1;
+          }
+        }
+      }
+      return {
+        crop,
+        averageSaturation: satSum / total,
+        averageBrightness: brightSum / total,
+        whiteRatio: whiteCount / total,
+        edgeDensity: edgeCount / Math.max(1, total),
+        colorfulRatio: colorful / total,
+      };
+    }
+
+    function suggestCategory(stats) {
+      if (stats.whiteRatio > 0.52 && stats.edgeDensity > 0.1) return "coloring";
+      if (stats.averageSaturation > 92 && stats.colorfulRatio > 0.28) return "sticker";
+      if (stats.edgeDensity > 0.12) return "activity";
+      if (stats.averageBrightness > 170 && stats.whiteRatio > 0.4) return "coloring";
+      return stats.averageSaturation > 70 ? "sticker" : "activity";
+    }
+
+    function averageHash(canvas) {
+      const small = document.createElement("canvas");
+      small.width = 8;
+      small.height = 8;
+      const ctx = small.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(canvas, 0, 0, 8, 8);
+      const { data } = ctx.getImageData(0, 0, 8, 8);
+      const gray = [];
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const v = Math.round(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+        gray.push(v);
+        sum += v;
+      }
+      const mean = sum / gray.length;
+      let bits = 0n;
+      for (let i = 0; i < gray.length; i++) {
+        if (gray[i] >= mean) bits |= 1n << BigInt(i);
+      }
+      return bits.toString(16).padStart(16, "0");
+    }
+
+    function hammingDistance(a, b) {
+      let x = BigInt(`0x${a}`) ^ BigInt(`0x${b}`);
+      let count = 0;
+      while (x > 0n) {
+        if (x & 1n) count += 1;
+        x >>= 1n;
+      }
+      return count;
+    }
+
+    function findMatch(groups, hash) {
+      let best = null;
+      let bestDistance = Infinity;
+      for (const group of groups) {
+        const distance = hammingDistance(group.hash, hash);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = group;
+        }
+      }
+      return bestDistance <= 5 ? best : null;
+    }
+
+    async function analyzePhoto(source, label) {
+      const img = typeof source === "string" ? await loadImage(source) : source;
+      const canvas = imageToCanvas(img);
+      const { mask, width, height } = createBinaryMask(canvas);
+      const closed = closeMask(mask, width, height);
+      let boxes = findComponents(closed, width, height);
+      boxes = boxes.filter((box) => {
+        const bw = box.maxX - box.minX + 1;
+        const bh = box.maxY - box.minY + 1;
+        const area = bw * bh;
+        const ratio = bw / bh;
+        const canvasArea = width * height;
+        return area > canvasArea * 0.0035 && area < canvasArea * 0.35 && ratio > 0.25 && ratio < 4.25;
+      });
+      boxes = dedupeBoxes(boxes);
+      if (!boxes.length) {
+        boxes = [{ minX: 0, minY: 0, maxX: width - 1, maxY: height - 1, area: width * height }];
+      }
+
+      const photoGroups = [];
+      for (const box of boxes) {
+        const stats = componentStats(canvas, box);
+        const hash = averageHash(stats.crop);
+        const cropUrl = stats.crop.toDataURL("image/jpeg", 0.88);
+        const category = suggestCategory(stats);
+        const existing = findMatch(photoGroups, hash);
+        if (existing) {
+          existing.count += 1;
+          existing.sourceLabels.push(label);
+          continue;
+        }
+        photoGroups.push({
+          id: 0,
+          hash,
+          crop: cropUrl,
+          count: 1,
+          sourceLabels: [label],
+          category,
+          categoryLabel: CATEGORY_LABELS[category],
+          decision: null,
+        });
+      }
+      return photoGroups;
+    }
+
+    function applySavedState(groups) {
+      for (const group of groups) {
+        const saved = state.storage[group.hash];
+        if (saved) {
+          if (CATEGORY_ORDER.includes(saved.category)) {
+            group.category = saved.category;
+            group.categoryLabel = CATEGORY_LABELS[saved.category];
+          }
+          group.decision = saved.decision ?? null;
+        }
+      }
+    }
+
+    function mergeGroups(existingGroups, newGroups) {
+      for (const incoming of newGroups) {
+        const match = existingGroups.find((group) => hammingDistance(group.hash, incoming.hash) <= 5);
+        if (match) {
+          match.count += incoming.count;
+          match.sourceLabels.push(...incoming.sourceLabels);
+          if (!match.decision && incoming.decision) match.decision = incoming.decision;
+          continue;
+        }
+        incoming.id = state.nextId++;
+        existingGroups.push(incoming);
+      }
+    }
+
+    async function processFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+      if (state.busy) return;
+      state.busy = true;
+      try {
+        setStatus(`Scanning ${files.length} photo${files.length === 1 ? "" : "s"}…`);
+        let batch = [];
+        for (let i = 0; i < files.length; i += 1) {
+          const file = files[i];
+          setStatus(`Scanning ${file.name} (${i + 1}/${files.length})…`);
+          const url = URL.createObjectURL(file);
+          const found = await analyzePhoto(url, file.name);
+          URL.revokeObjectURL(url);
+          applySavedState(found);
+          mergeGroups(batch, found);
+        }
+        state.groups = batch;
+        state.groups.forEach((group, idx) => { group.id = idx + 1; });
+        state.nextId = state.groups.length + 1;
+        renderGallery();
+        setStatus(`Detected ${state.groups.length} book${state.groups.length === 1 ? "" : "s"}. Tap any card to enlarge it.`);
+      } catch (err) {
+        console.error(err);
+        setStatus(`Detection failed: ${err?.message || err}. You can still try another photo.`);
+      } finally {
+        state.busy = false;
+      }
+    }
+
+    async function loadDemo() {
+      setStatus("Loading the sample floor photo…");
+      const response = await fetch("/books/demo-photo");
+      if (!response.ok) throw new Error(`Demo photo request failed (${response.status})`);
+      const blob = await response.blob();
+      const file = new File([blob], "demo-floor-photo.jpg", { type: blob.type || "image/jpeg" });
+      await processFiles([file]);
+    }
+
+    function clearStorage() {
+      state.storage = {};
+      saveStorage();
+    }
+
+    els.fileInput.addEventListener("change", async (ev) => {
+      const input = ev.target;
+      await processFiles(input.files);
+      input.value = "";
+    });
+
+    els.demoBtn.addEventListener("click", () => loadDemo().catch((err) => setStatus(err.message)));
+    els.clearBtn.addEventListener("click", () => {
+      clearStorage();
+      clearDecisions();
+    });
+    els.exportJsonBtn.addEventListener("click", downloadJSON);
+    els.exportTextBtn.addEventListener("click", () => copyTextList().catch((err) => setStatus(err.message)));
+    els.closeModalBtn.addEventListener("click", closeModal);
+    els.modalBackdrop.addEventListener("click", (ev) => {
+      if (ev.target === els.modalBackdrop) closeModal();
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") closeModal();
+      if (ev.key === "ArrowLeft" && state.selectedId != null) {
+        const idx = state.groups.findIndex((g) => g.id === state.selectedId);
+        const prev = state.groups[idx - 1];
+        if (prev) openModal(prev.id);
+      }
+      if (ev.key === "ArrowRight" && state.selectedId != null) {
+        const idx = state.groups.findIndex((g) => g.id === state.selectedId);
+        const next = state.groups[idx + 1];
+        if (next) openModal(next.id);
+      }
+      if ((ev.key === "k" || ev.key === "K") && state.selectedId != null) {
+        setDecision(state.selectedId, "keep");
+      }
+      if ((ev.key === "d" || ev.key === "D") && state.selectedId != null) {
+        setDecision(state.selectedId, "discard");
+      }
+      if ((ev.key === "u" || ev.key === "U") && state.selectedId != null) {
+        setDecision(state.selectedId, null);
+      }
+    });
+
+    // Start with the demo image so the app is immediately useful.
+    loadDemo().catch((err) => {
+      console.warn(err);
+      setStatus("Demo photo failed to load. Upload your own floor photo to continue.");
+    });
+  </script>
+</body>
+</html>

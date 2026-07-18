@@ -56,6 +56,9 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn('id="modalDecisionOverlay"', HTML)
         self.assertIn("formatCategorySubtitle", HTML)
         self.assertIn("renderModalDecisionOverlay", HTML)
+        self.assertIn("font-size: clamp(7rem, 32vw, 14rem);", HTML)
+        self.assertIn("function toggleDecision(id, decision)", HTML)
+        self.assertIn("group.decision === decision ? null : decision", HTML)
         self.assertNotIn('rotateBtn.className = "icon-btn rotate"', HTML)
         self.assertNotIn("rotate 0°", HTML)
         self.assertNotIn("hash ${group.hash", HTML)
@@ -66,6 +69,9 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn('addEventListener("touchend"', HTML)
         self.assertIn("function navigateModal(delta)", HTML)
         self.assertIn("navigateModal(dx < 0 ? 1 : -1);", HTML)
+        self.assertIn("Swipe left/right", HTML)
+        self.assertIn("swipe-edge left", HTML)
+        self.assertIn("swipe-edge right", HTML)
 
     def test_sample_labels_use_image_specific_specs_before_detector_fallback(self):
         self.assertIn("const sampleSpecs = sampleSpecsForLabel(label);", HTML)

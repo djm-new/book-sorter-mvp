@@ -238,7 +238,49 @@
     .modal-decision-overlay.keep,
     .modal-decision-overlay.discard {
       display: grid;
+      font-size: clamp(7rem, 32vw, 14rem);
     }
+
+    .swipe-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(2, 6, 23, 0.66);
+      color: rgba(248, 250, 252, 0.92);
+      font-size: 0.82rem;
+      font-weight: 750;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .swipe-edge {
+      position: absolute;
+      top: 50%;
+      z-index: 2;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 54px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(2, 6, 23, 0.42);
+      color: rgba(248, 250, 252, 0.9);
+      font-size: 1.7rem;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+    }
+
+    .swipe-edge.left { left: 8px; }
+    .swipe-edge.right { right: 8px; }
 
     .card-labels {
       position: absolute;
@@ -557,6 +599,9 @@
         <div class="modal-image-wrap" id="modalImageWrap">
           <img id="modalImage" class="modal-image" alt="Selected book crop" />
           <div id="modalDecisionOverlay" class="overlay modal-decision-overlay" aria-hidden="true"></div>
+          <div class="swipe-edge left" aria-hidden="true">‹</div>
+          <div class="swipe-edge right" aria-hidden="true">›</div>
+          <div class="swipe-hint" aria-hidden="true">Swipe left/right</div>
           <div class="decision-row" aria-label="Book decision actions">
             <button class="icon-btn keep" id="modalImageKeepBtn" type="button" aria-label="Mark keep">✓</button>
             <button class="icon-btn discard" id="modalImageDiscardBtn" type="button" aria-label="Mark discard">✕</button>
@@ -823,7 +868,7 @@
         keepBtn.setAttribute("aria-label", `Mark ${formatGroupLabel(group)} keep`);
         keepBtn.addEventListener("click", (ev) => {
           ev.stopPropagation();
-          setDecision(group.id, "keep");
+          toggleDecision(group.id, "keep");
         });
 
         const discardBtn = document.createElement("button");
@@ -833,7 +878,7 @@
         discardBtn.setAttribute("aria-label", `Mark ${formatGroupLabel(group)} discard`);
         discardBtn.addEventListener("click", (ev) => {
           ev.stopPropagation();
-          setDecision(group.id, "discard");
+          toggleDecision(group.id, "discard");
         });
 
         actions.appendChild(keepBtn);
@@ -889,8 +934,8 @@
         els.categoryRow.appendChild(button);
       });
 
-      els.modalImageKeepBtn.onclick = () => setDecision(group.id, "keep");
-      els.modalImageDiscardBtn.onclick = () => setDecision(group.id, "discard");
+      els.modalImageKeepBtn.onclick = () => toggleDecision(group.id, "keep");
+      els.modalImageDiscardBtn.onclick = () => toggleDecision(group.id, "discard");
       els.modalRotateLeftBtn.onclick = () => rotateGroup(group.id, -90);
       els.modalRotateRightBtn.onclick = () => rotateGroup(group.id, 90);
       els.modalBlankBtn.onclick = () => setDecision(group.id, null);
@@ -920,6 +965,12 @@
         rotation: group.rotation || 0,
       };
       saveStorage();
+    }
+
+    function toggleDecision(id, decision) {
+      const group = state.groups.find((g) => g.id === id);
+      if (!group) return;
+      setDecision(id, group.decision === decision ? null : decision);
     }
 
     function setDecision(id, decision) {

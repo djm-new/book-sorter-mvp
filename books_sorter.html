@@ -680,6 +680,7 @@
   <script>
     const CATEGORY_ORDER = ["coloring", "activity", "sticker"];
     const STORAGE_KEY = "hermes-book-sorter-decisions-v1";
+    const ACTIVITY_SESSION_KEY = "hermes-book-sorter-activity-session-v1";
     const CATEGORY_LABELS = {
       coloring: "Coloring",
       activity: "Activity",
@@ -785,6 +786,8 @@
       nextId: 1,
       selectedId: null,
       storage: loadStorage(),
+      activitySessionId: loadActivitySessionId(),
+      lastHeartbeatAt: Date.now(),
       busy: false,
     };
 
@@ -834,6 +837,59 @@
 
     function saveStorage() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.storage));
+    }
+
+    function loadActivitySessionId() {
+      let sessionId = localStorage.getItem(ACTIVITY_SESSION_KEY);
+      if (!sessionId) {
+        sessionId = crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem(ACTIVITY_SESSION_KEY, sessionId);
+      }
+      return sessionId;
+    }
+
+    function deviceLabel() {
+      const ua = navigator.userAgent || "";
+      const platform = navigator.platform || "";
+      if (/iPhone/i.test(ua)) return "iPhone";
+      if (/iPad/i.test(ua)) return "iPad";
+      if (/Android/i.test(ua)) return "Android";
+      if (/Mac/i.test(platform)) return "Mac";
+      if (/Win/i.test(platform)) return "Windows";
+      return platform || "Unknown device";
+    }
+
+    function activityBasePayload(extra = {}) {
+      return {
+        sessionId: state.activitySessionId,
+        deviceLabel: deviceLabel(),
+        userAgent: navigator.userAgent || "",
+        ...extra,
+      };
+    }
+
+    function sendActivityHeartbeat(pageLoad = false) {
+      const now = Date.now();
+      const activeSecondsDelta = document.visibilityState === "visible" ? Math.max(0, Math.round((now - state.lastHeartbeatAt) / 1000)) : 0;
+      state.lastHeartbeatAt = now;
+      fetch("/api/activity/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(activityBasePayload({ pageLoad, activeSecondsDelta })),
+      }).catch((err) => console.warn("Activity heartbeat failed", err));
+    }
+
+    function sendActivityAction(type, group = null) {
+      fetch("/api/activity/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(activityBasePayload({
+          type,
+          bookHash: group?.hash || "",
+          label: group ? formatGroupLabel(group) : "",
+          activeSecondsDelta: 0,
+        })),
+      }).catch((err) => console.warn("Activity action failed", err));
     }
 
     async function loadSharedStorage() {
@@ -1027,6 +1083,7 @@
           group.category = category;
           group.categoryLabel = CATEGORY_LABELS[category];
           persistGroup(group);
+          sendActivityAction("category", group);
           renderGallery();
           openModal(group.id);
         });
@@ -1078,6 +1135,7 @@
       if (!group) return;
       group.decision = decision;
       persistGroup(group);
+      sendActivityAction(decision === "keep" || decision === "discard" ? decision : "clear", group);
       renderGallery();
       if (state.selectedId === id) {
         openModal(id);
@@ -1092,6 +1150,7 @@
       group.category = next;
       group.categoryLabel = CATEGORY_LABELS[next];
       persistGroup(group);
+      sendActivityAction("category", group);
       renderGallery();
       if (state.selectedId === id) openModal(id);
     }
@@ -1102,6 +1161,7 @@
       const current = group.rotation || 0;
       group.rotation = ((current + delta) % 360 + 360) % 360;
       persistGroup(group);
+      sendActivityAction("rotation", group);
       renderGallery();
       if (state.selectedId === id) openModal(id);
     }
@@ -1744,6 +1804,10 @@
     setInterval(() => {
       refreshSharedStorage().catch((err) => console.warn("Shared refresh failed", err));
     }, 10000);
+
+    sendActivityHeartbeat(true);
+    setInterval(() => sendActivityHeartbeat(false), 15000);
+    document.addEventListener("visibilitychange", () => sendActivityHeartbeat(false));
 
     // Start with the bundled sample set so the app is immediately useful.
     loadSampleSet().catch((err) => {

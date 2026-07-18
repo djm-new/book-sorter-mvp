@@ -79,6 +79,16 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn("async function refreshSharedStorage()", HTML)
         self.assertIn("setInterval(() =>", HTML)
 
+    def test_activity_tracking_client(self):
+        self.assertIn("ACTIVITY_SESSION_KEY", HTML)
+        self.assertIn('fetch("/api/activity/heartbeat"', HTML)
+        self.assertIn('fetch("/api/activity/action"', HTML)
+        self.assertIn("sendActivityHeartbeat(true)", HTML)
+        self.assertIn("setInterval(() => sendActivityHeartbeat(false), 15000)", HTML)
+        self.assertIn('document.addEventListener("visibilitychange"', HTML)
+        self.assertIn('sendActivityAction(decision === "keep" || decision === "discard" ? decision : "clear", group)', HTML)
+        self.assertIn('sendActivityAction("rotation", group)', HTML)
+
     def test_modal_swipe_navigation(self):
         self.assertIn('id="modalImageWrap"', HTML)
         self.assertIn('addEventListener("touchstart"', HTML)

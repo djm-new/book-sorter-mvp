@@ -1194,9 +1194,8 @@
     async function analyzePhoto(source, label) {
       const img = typeof source === "string" ? await loadImage(source) : source;
       const canvas = imageToCanvas(img);
-      if ((label || "").toLowerCase().includes("sample")) {
-        return buildSampleGroups(canvas);
-      }
+      // Always run the real detector. The bundled sample photos are just inputs,
+      // not a special layout, so they should be segmented exactly like uploads.
       const { mask, width, height } = createBinaryMask(canvas);
       const closed = closeMask(mask, width, height);
       let boxes = findComponents(closed, width, height);

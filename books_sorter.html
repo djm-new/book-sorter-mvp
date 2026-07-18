@@ -212,6 +212,7 @@
       object-fit: contain;
       display: block;
       background: rgba(3, 7, 18, 0.92);
+      transform-origin: center center;
     }
 
     .overlay {
@@ -444,7 +445,7 @@
           <div class="button-row">
             <label class="btn primary" for="fileInput">Upload photos</label>
             <input class="sr-only" id="fileInput" type="file" accept="image/*" multiple />
-            <button class="btn" id="demoBtn" type="button">Load demo photo</button>
+            <button class="btn" id="sampleBtn" type="button">Load sample set</button>
             <button class="btn ghost" id="clearBtn" type="button">Clear decisions</button>
             <button class="btn ghost" id="exportJsonBtn" type="button">Export JSON</button>
             <button class="btn ghost" id="exportTextBtn" type="button">Copy keep/discard list</button>
@@ -468,7 +469,7 @@
 
         <div id="gallery" class="gallery"></div>
         <div id="emptyState" class="empty-state">
-          No books detected yet. Upload a floor photo or load the demo image to get started.
+          No books detected yet. Upload a floor photo or load the sample set to get started.
         </div>
       </section>
     </main>
@@ -493,6 +494,8 @@
           <button class="btn" id="modalDiscardBtn" type="button">Red X — discard</button>
         </div>
         <div class="footer-group">
+          <button class="btn ghost" id="modalRotateLeftBtn" type="button">↺ Rotate left</button>
+          <button class="btn ghost" id="modalRotateRightBtn" type="button">↻ Rotate right</button>
           <button class="btn ghost" id="modalBlankBtn" type="button">Blank — undecided</button>
         </div>
       </div>
@@ -509,9 +512,17 @@
       sticker: "Sticker",
     };
 
-    // Tight demo crops for the bundled sample photo so the gallery shows
+    const SAMPLE_IMAGES = [
+      "/sample-images/01.jpg",
+      "/sample-images/02.jpg",
+      "/sample-images/03.jpg",
+      "/sample-images/04.jpg",
+      "/sample-images/05.jpg",
+    ];
+
+    // Tight crops for the bundled sample photos so the gallery shows
     // each individual book instead of the whole floor shot.
-    const DEMO_BOOK_SPECS = [
+    const SAMPLE_BOOK_SPECS = [
       { title: "Fun Crafts for Kids", x: 108, y: 165, w: 188, h: 206, rotation: 90, pad: 4 },
       { title: "Paper", x: 335, y: 72, w: 190, h: 220, rotation: 90, pad: 4 },
       { title: "The Hardest Hidden Pictures Book Ever", x: 590, y: 24, w: 232, h: 214, rotation: 90, pad: 4 },
@@ -544,7 +555,7 @@
       gallery: document.getElementById("gallery"),
       emptyState: document.getElementById("emptyState"),
       fileInput: document.getElementById("fileInput"),
-      demoBtn: document.getElementById("demoBtn"),
+      sampleBtn: document.getElementById("sampleBtn"),
       clearBtn: document.getElementById("clearBtn"),
       exportJsonBtn: document.getElementById("exportJsonBtn"),
       exportTextBtn: document.getElementById("exportTextBtn"),
@@ -563,6 +574,8 @@
       categoryRow: document.getElementById("categoryRow"),
       modalKeepBtn: document.getElementById("modalKeepBtn"),
       modalDiscardBtn: document.getElementById("modalDiscardBtn"),
+      modalRotateLeftBtn: document.getElementById("modalRotateLeftBtn"),
+      modalRotateRightBtn: document.getElementById("modalRotateRightBtn"),
       modalBlankBtn: document.getElementById("modalBlankBtn"),
       closeModalBtn: document.getElementById("closeModalBtn"),
       workCanvas: document.getElementById("workCanvas"),
@@ -619,6 +632,7 @@
         const img = document.createElement("img");
         img.src = group.crop;
         img.alt = formatGroupLabel(group);
+        img.style.transform = `rotate(${group.rotation || 0}deg)`;
         card.appendChild(img);
 
         const labels = document.createElement("div");
@@ -700,7 +714,7 @@
       const group = currentGroup();
       if (!group) return;
       els.modalTitle.textContent = formatGroupLabel(group);
-      els.modalSub.textContent = `${group.categoryLabel} · ${group.decision ? group.decision : "undecided"} · hash ${group.hash.slice(0, 10)}`;
+      els.modalSub.textContent = `${group.categoryLabel} · ${group.decision ? group.decision : "undecided"} · rotate ${group.rotation || 0}° · hash ${group.hash.slice(0, 10)}`;
       els.modalImage.src = group.crop;
       els.modalBackdrop.classList.add("open");
       renderModalActions();
@@ -732,6 +746,8 @@
 
       els.modalKeepBtn.onclick = () => setDecision(group.id, "keep");
       els.modalDiscardBtn.onclick = () => setDecision(group.id, "discard");
+      els.modalRotateLeftBtn.onclick = () => rotateGroup(group.id, -90);
+      els.modalRotateRightBtn.onclick = () => rotateGroup(group.id, 90);
       els.modalBlankBtn.onclick = () => setDecision(group.id, null);
     }
 
@@ -739,6 +755,7 @@
       state.storage[group.hash] = {
         category: group.category,
         decision: group.decision,
+        rotation: group.rotation || 0,
       };
       saveStorage();
     }
@@ -761,6 +778,16 @@
       const next = CATEGORY_ORDER[(idx + 1) % CATEGORY_ORDER.length];
       group.category = next;
       group.categoryLabel = CATEGORY_LABELS[next];
+      persistGroup(group);
+      renderGallery();
+      if (state.selectedId === id) openModal(id);
+    }
+
+    function rotateGroup(id, delta) {
+      const group = state.groups.find((g) => g.id === id);
+      if (!group) return;
+      const current = group.rotation || 0;
+      group.rotation = ((current + delta) % 360 + 360) % 360;
       persistGroup(group);
       renderGallery();
       if (state.selectedId === id) openModal(id);
@@ -793,6 +820,7 @@
         category: group.category,
         decision: group.decision,
         count: group.count,
+        rotation: group.rotation || 0,
       };
     }
 
@@ -874,8 +902,8 @@
       return out;
     }
 
-    function buildDemoGroups(canvas) {
-      return DEMO_BOOK_SPECS.map((spec, idx) => {
+    function buildSampleGroups(canvas) {
+      return SAMPLE_BOOK_SPECS.map((spec, idx) => {
         const crop = cropRotatedRegion(canvas, spec);
         const stats = componentStats(crop, { minX: 0, minY: 0, maxX: crop.width - 1, maxY: crop.height - 1 });
         const hash = averageHash(stats.crop);
@@ -886,11 +914,12 @@
           crop: crop.toDataURL("image/jpeg", 0.9),
           aspectRatio: crop.width / crop.height,
           count: 1,
-          sourceLabels: ["demo photo"],
+          sourceLabels: ["sample photo"],
           category,
           categoryLabel: CATEGORY_LABELS[category],
           decision: null,
           title: spec.title,
+          rotation: 0,
         };
       });
     }
@@ -1165,8 +1194,8 @@
     async function analyzePhoto(source, label) {
       const img = typeof source === "string" ? await loadImage(source) : source;
       const canvas = imageToCanvas(img);
-      if ((label || "").toLowerCase().includes("demo")) {
-        return buildDemoGroups(canvas);
+      if ((label || "").toLowerCase().includes("sample")) {
+        return buildSampleGroups(canvas);
       }
       const { mask, width, height } = createBinaryMask(canvas);
       const closed = closeMask(mask, width, height);
@@ -1206,6 +1235,7 @@
           category,
           categoryLabel: CATEGORY_LABELS[category],
           decision: null,
+          rotation: 0,
         });
       }
       return photoGroups;
@@ -1220,6 +1250,7 @@
             group.categoryLabel = CATEGORY_LABELS[saved.category];
           }
           group.decision = saved.decision ?? null;
+          group.rotation = saved.rotation ?? 0;
         }
       }
     }
@@ -1268,13 +1299,17 @@
       }
     }
 
-    async function loadDemo() {
-      setStatus("Loading the sample floor photo…");
-      const response = await fetch("/books/demo-photo");
-      if (!response.ok) throw new Error(`Demo photo request failed (${response.status})`);
-      const blob = await response.blob();
-      const file = new File([blob], "demo-floor-photo.jpg", { type: blob.type || "image/jpeg" });
-      await processFiles([file]);
+    async function loadSampleSet() {
+      setStatus("Loading the sample photos…");
+      const files = [];
+      for (let i = 0; i < SAMPLE_IMAGES.length; i += 1) {
+        const response = await fetch(SAMPLE_IMAGES[i]);
+        if (!response.ok) throw new Error(`Sample image request failed (${response.status})`);
+        const blob = await response.blob();
+        const filename = `sample-${String(i + 1).padStart(2, "0")}.jpg`;
+        files.push(new File([blob], filename, { type: blob.type || "image/jpeg" }));
+      }
+      await processFiles(files);
     }
 
     function clearStorage() {
@@ -1288,7 +1323,7 @@
       input.value = "";
     });
 
-    els.demoBtn.addEventListener("click", () => loadDemo().catch((err) => setStatus(err.message)));
+    els.sampleBtn.addEventListener("click", () => loadSampleSet().catch((err) => setStatus(err.message)));
     els.clearBtn.addEventListener("click", () => {
       clearStorage();
       clearDecisions();
@@ -1322,10 +1357,10 @@
       }
     });
 
-    // Start with the demo image so the app is immediately useful.
-    loadDemo().catch((err) => {
+    // Start with the bundled sample set so the app is immediately useful.
+    loadSampleSet().catch((err) => {
       console.warn(err);
-      setStatus("Demo photo failed to load. Upload your own floor photo to continue.");
+      setStatus("Sample photos failed to load. Upload your own photos to continue.");
     });
   </script>
 </body>

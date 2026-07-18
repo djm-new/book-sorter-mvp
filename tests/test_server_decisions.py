@@ -49,6 +49,13 @@ class ServerDecisionTests(unittest.TestCase):
         self.assertEqual(cleared.status_code, 200)
         self.assertEqual(self.client.get("/api/decisions").json()["decisions"], {})
 
+    def test_contact_sheet_page_loads(self):
+        res = self.client.get("/books/contact-sheet/4f8b2d7c")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("Book Sorter Contact Sheet", res.text)
+        self.assertIn("/api/decisions", res.text)
+        self.assertIn("/sample-crops/manifest.json", res.text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,8 +15,10 @@ from fastapi.staticfiles import StaticFiles
 
 APP_DIR = Path(__file__).resolve().parent
 HTML_PATH = APP_DIR / "books_sorter.html"
+CONTACT_SHEET_HTML_PATH = APP_DIR / "contact_sheet.html"
 SECRET_PATH = "/books/4f8b2d7c"
 ADMIN_ACTIVITY_PATH = "/admin/activity/4f8b2d7c"
+CONTACT_SHEET_PATH = "/books/contact-sheet/4f8b2d7c"
 DATA_DIR = Path(os.environ.get("BOOK_SORTER_DATA_DIR", "/data/book-sorter" if Path("/data").exists() else APP_DIR / ".data"))
 DECISIONS_PATH = DATA_DIR / "decisions.json"
 ACTIVITY_PATH = DATA_DIR / "activity.json"
@@ -241,6 +243,11 @@ def books_sorter_page():
 @app.get("/books-sorter.html", include_in_schema=False)
 def books_sorter_alias():
     return books_sorter_page()
+
+
+@app.get(CONTACT_SHEET_PATH, include_in_schema=False)
+def contact_sheet_page():
+    return HTMLResponse(CONTACT_SHEET_HTML_PATH.read_text(encoding="utf-8"), headers={"Cache-Control": "no-store"})
 
 
 @app.get(ADMIN_ACTIVITY_PATH, include_in_schema=False)

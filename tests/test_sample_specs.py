@@ -89,6 +89,10 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn('sendActivityAction(decision === "keep" || decision === "discard" ? decision : "clear", group)', HTML)
         self.assertIn('sendActivityAction("rotation", group)', HTML)
 
+    def test_contact_sheet_link(self):
+        self.assertIn('href="/books/contact-sheet/4f8b2d7c"', HTML)
+        self.assertIn("Contact sheet", HTML)
+
     def test_modal_swipe_navigation(self):
         self.assertIn('id="modalImageWrap"', HTML)
         self.assertIn('addEventListener("touchstart"', HTML)

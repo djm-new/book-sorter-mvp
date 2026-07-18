@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book Sorter Contact Sheet</title>
+  <style>
+    :root { color-scheme: dark; --bg:#070b16; --panel:#111827; --line:rgba(255,255,255,.13); --muted:rgba(226,232,240,.72); --text:#f8fafc; --green:#22c55e; --red:#ef4444; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:linear-gradient(180deg,#050816,#0b1020); color:var(--text); }
+    header { position: sticky; top: 0; z-index: 10; padding: 12px; background: rgba(5,8,22,.94); backdrop-filter: blur(14px); border-bottom:1px solid var(--line); }
+    .head-inner, main { width:min(1200px,100%); margin:0 auto; }
+    h1 { margin:0; font-size: clamp(1.35rem, 5vw, 2.2rem); letter-spacing:-.04em; }
+    .sub { margin:4px 0 0; color:var(--muted); font-size:.95rem; }
+    .tabs { display:flex; gap:8px; margin-top:12px; }
+    .tab { border:1px solid var(--line); color:var(--text); background:#172033; border-radius:999px; padding:9px 12px; font-weight:800; }
+    .tab.keep.active { background:rgba(34,197,94,.20); border-color:rgba(34,197,94,.55); }
+    .tab.discard.active { background:rgba(239,68,68,.20); border-color:rgba(239,68,68,.55); }
+    main { padding: 16px 12px 40px; }
+    section { margin-bottom: 28px; }
+    h2 { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:0 0 10px; font-size:1.2rem; }
+    h2 .count { color:var(--muted); font-size:.92rem; font-weight:700; }
+    .grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
+    @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    @media (min-width: 1000px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+    .card { border:1px solid var(--line); border-radius:16px; overflow:hidden; background:rgba(15,23,42,.82); box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+    .img-wrap { aspect-ratio: 1; display:grid; place-items:center; background:#020617; overflow:hidden; }
+    img { max-width:100%; max-height:100%; display:block; object-fit:contain; }
+    .meta { padding:9px; display:grid; gap:4px; }
+    .title { font-weight:850; font-size:.94rem; line-height:1.14; }
+    .cat { color:var(--muted); font-size:.82rem; }
+    .badge { display:inline-flex; width:max-content; border-radius:999px; padding:3px 7px; font-size:.76rem; font-weight:900; }
+    .badge.keep { background:rgba(34,197,94,.18); color:#86efac; }
+    .badge.discard { background:rgba(239,68,68,.18); color:#fca5a5; }
+    .empty { border:1px dashed var(--line); border-radius:16px; padding:18px; color:var(--muted); }
+    @media print { header { position: static; } body { background:#fff; color:#000; } .card { break-inside: avoid; border-color:#ccc; box-shadow:none; } .cat,.sub,.count { color:#444; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <h1>Book Sorter Contact Sheet</h1>
+    <p class="sub" id="summary">Loading keep/discard lists…</p>
+    <div class="tabs">
+      <button class="tab keep active" type="button" data-filter="all">All</button>
+      <button class="tab keep" type="button" data-filter="keep">Keep</button>
+      <button class="tab discard" type="button" data-filter="discard">Discard</button>
+    </div>
+  </div>
+</header>
+<main>
+  <section id="keepSection">
+    <h2>Keep <span class="count" id="keepCount"></span></h2>
+    <div class="grid" id="keepGrid"></div>
+  </section>
+  <section id="discardSection">
+    <h2>Discard <span class="count" id="discardCount"></span></h2>
+    <div class="grid" id="discardGrid"></div>
+  </section>
+</main>
+<script>
+const CATEGORY_LABELS = { coloring: "Coloring", activity: "Activity", sticker: "Sticker" };
+const els = {
+  summary: document.getElementById('summary'), keepGrid: document.getElementById('keepGrid'), discardGrid: document.getElementById('discardGrid'),
+  keepCount: document.getElementById('keepCount'), discardCount: document.getElementById('discardCount'), keepSection: document.getElementById('keepSection'), discardSection: document.getElementById('discardSection')
+};
+function loadImage(src) { return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = src; }); }
+function imageToCanvas(img, maxSide = 600) { const canvas = document.createElement('canvas'); const scale = Math.min(1, maxSide / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height)); canvas.width = Math.max(1, Math.round((img.naturalWidth || img.width) * scale)); canvas.height = Math.max(1, Math.round((img.naturalHeight || img.height) * scale)); canvas.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0, canvas.width, canvas.height); return canvas; }
+function averageHash(canvas) { const small = document.createElement('canvas'); small.width = 8; small.height = 8; const ctx = small.getContext('2d', { willReadFrequently: true }); ctx.drawImage(canvas, 0, 0, 8, 8); const { data } = ctx.getImageData(0, 0, 8, 8); const gray = []; let sum = 0; for (let i = 0; i < data.length; i += 4) { const v = Math.round(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114); gray.push(v); sum += v; } const mean = sum / gray.length; let bits = 0n; for (let i = 0; i < gray.length; i++) if (gray[i] >= mean) bits |= 1n << BigInt(i); return bits.toString(16).padStart(16, '0'); }
+function titleFor(item) { const t = (item.title || '').trim(); return t || 'Untitled'; }
+function card(item, decision) {
+  const category = CATEGORY_LABELS[decision.category] || CATEGORY_LABELS[item.category] || 'Activity';
+  const rotation = Number(decision.rotation ?? item.rotation ?? 0) || 0;
+  const div = document.createElement('article'); div.className = 'card';
+  div.innerHTML = `<div class="img-wrap"><img src="${item.src}" alt="${escapeHtml(titleFor(item))}" style="transform: rotate(${rotation}deg)"></div><div class="meta"><span class="badge ${decision.decision}">${decision.decision === 'keep' ? 'KEEP' : 'DISCARD'}</span><div class="title">${escapeHtml(titleFor(item))}</div><div class="cat">${escapeHtml(category)}</div></div>`;
+  return div;
+}
+function escapeHtml(value) { return String(value).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+async function load() {
+  const [manifest, decisionsPayload] = await Promise.all([
+    fetch('/sample-crops/manifest.json', { cache: 'no-store' }).then(r => r.json()),
+    fetch('/api/decisions', { cache: 'no-store' }).then(r => r.json()),
+  ]);
+  const decisions = decisionsPayload.decisions || {};
+  const keep = [], discard = [], undecided = [];
+  for (let i = 0; i < (manifest.items || []).length; i += 1) {
+    const item = manifest.items[i];
+    els.summary.textContent = `Matching decisions to images… ${i + 1}/${manifest.items.length}`;
+    const hash = averageHash(imageToCanvas(await loadImage(item.src), 600));
+    item.hash = hash;
+    const decision = decisions[hash] || {};
+    if (decision.decision === 'keep') keep.push([item, decision]);
+    else if (decision.decision === 'discard') discard.push([item, decision]);
+    else undecided.push(item);
+  }
+  keep.sort((a,b) => titleFor(a[0]).localeCompare(titleFor(b[0])));
+  discard.sort((a,b) => titleFor(a[0]).localeCompare(titleFor(b[0])));
+  els.keepCount.textContent = `${keep.length} item${keep.length === 1 ? '' : 's'}`;
+  els.discardCount.textContent = `${discard.length} item${discard.length === 1 ? '' : 's'}`;
+  els.summary.textContent = `${keep.length} keep · ${discard.length} discard · ${undecided.length} undecided`;
+  els.keepGrid.innerHTML = ''; els.discardGrid.innerHTML = '';
+  keep.forEach(([item, decision]) => els.keepGrid.appendChild(card(item, decision)));
+  discard.forEach(([item, decision]) => els.discardGrid.appendChild(card(item, decision)));
+  if (!keep.length) els.keepGrid.innerHTML = '<div class="empty">No keep items yet.</div>';
+  if (!discard.length) els.discardGrid.innerHTML = '<div class="empty">No discard items yet.</div>';
+}
+document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+  const f = btn.dataset.filter; els.keepSection.style.display = f === 'discard' ? 'none' : ''; els.discardSection.style.display = f === 'keep' ? 'none' : '';
+}));
+load().catch(err => { console.error(err); els.summary.textContent = `Could not load contact sheet: ${err.message || err}`; });
+</script>
+</body>
+</html>

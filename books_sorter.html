@@ -239,6 +239,8 @@
     .modal-decision-overlay.discard {
       display: grid;
       font-size: clamp(7rem, 32vw, 14rem);
+      pointer-events: auto;
+      cursor: pointer;
     }
 
     .swipe-hint {
@@ -777,6 +779,46 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.storage));
     }
 
+    async function loadSharedStorage() {
+      try {
+        const response = await fetch("/api/decisions", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Shared decisions failed (${response.status})`);
+        const data = await response.json();
+        if (data?.decisions && typeof data.decisions === "object") {
+          state.storage = { ...state.storage, ...data.decisions };
+          saveStorage();
+        }
+      } catch (err) {
+        console.warn("Shared decisions unavailable; using this browser only", err);
+      }
+    }
+
+    async function refreshSharedStorage() {
+      if (!state.groups.length) return;
+      const before = JSON.stringify(state.storage);
+      await loadSharedStorage();
+      if (JSON.stringify(state.storage) === before) return;
+      applySavedState(state.groups);
+      renderGallery();
+      if (state.selectedId != null) openModal(state.selectedId);
+    }
+
+    function saveSharedGroup(group) {
+      fetch(`/api/decisions/${encodeURIComponent(group.hash)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: group.category,
+          decision: group.decision,
+          rotation: group.rotation || 0,
+        }),
+      }).catch((err) => console.warn("Shared decision save failed", err));
+    }
+
+    function clearSharedStorage() {
+      fetch("/api/decisions", { method: "DELETE" }).catch((err) => console.warn("Shared decision clear failed", err));
+    }
+
     function setStatus(message) {
       els.status.textContent = message;
     }
@@ -965,6 +1007,7 @@
         rotation: group.rotation || 0,
       };
       saveStorage();
+      saveSharedGroup(group);
     }
 
     function toggleDecision(id, decision) {
@@ -1495,6 +1538,7 @@
       state.busy = true;
       try {
         setStatus(`Scanning ${files.length} photo${files.length === 1 ? "" : "s"}…`);
+        await loadSharedStorage();
         let batch = [];
         for (let i = 0; i < files.length; i += 1) {
           const file = files[i];
@@ -1553,6 +1597,7 @@
       state.busy = true;
       try {
         setStatus("Loading generated book crops…");
+        await loadSharedStorage();
         const groups = await buildManifestGroups();
         state.groups = groups;
         state.groups.forEach((group, idx) => { group.id = idx + 1; });
@@ -1570,6 +1615,7 @@
     function clearStorage() {
       state.storage = {};
       saveStorage();
+      clearSharedStorage();
     }
 
     els.fileInput.addEventListener("change", async (ev) => {
@@ -1588,6 +1634,10 @@
     els.closeModalBtn.addEventListener("click", closeModal);
     els.modalBackdrop.addEventListener("click", (ev) => {
       if (ev.target === els.modalBackdrop) closeModal();
+    });
+    els.modalDecisionOverlay.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (state.selectedId != null) setDecision(state.selectedId, null);
     });
 
     let modalTouchStart = null;
@@ -1629,6 +1679,10 @@
         setDecision(state.selectedId, null);
       }
     });
+
+    setInterval(() => {
+      refreshSharedStorage().catch((err) => console.warn("Shared refresh failed", err));
+    }, 10000);
 
     // Start with the bundled sample set so the app is immediately useful.
     loadSampleSet().catch((err) => {

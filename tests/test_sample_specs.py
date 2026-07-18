@@ -59,9 +59,18 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn("font-size: clamp(7rem, 32vw, 14rem);", HTML)
         self.assertIn("function toggleDecision(id, decision)", HTML)
         self.assertIn("group.decision === decision ? null : decision", HTML)
+        self.assertIn('modalDecisionOverlay.addEventListener("click"', HTML)
+        self.assertIn("if (state.selectedId != null) setDecision(state.selectedId, null);", HTML)
         self.assertNotIn('rotateBtn.className = "icon-btn rotate"', HTML)
         self.assertNotIn("rotate 0°", HTML)
         self.assertNotIn("hash ${group.hash", HTML)
+
+    def test_shared_server_decisions(self):
+        self.assertIn('fetch("/api/decisions", { cache: "no-store" })', HTML)
+        self.assertIn('fetch(`/api/decisions/${encodeURIComponent(group.hash)}`', HTML)
+        self.assertIn('fetch("/api/decisions", { method: "DELETE" })', HTML)
+        self.assertIn("async function refreshSharedStorage()", HTML)
+        self.assertIn("setInterval(() =>", HTML)
 
     def test_modal_swipe_navigation(self):
         self.assertIn('id="modalImageWrap"', HTML)

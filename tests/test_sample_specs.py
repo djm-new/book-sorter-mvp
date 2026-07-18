@@ -9,6 +9,13 @@ MANIFEST = json.loads((ROOT / "sample-crops" / "manifest.json").read_text(encodi
 
 
 class SampleSpecTests(unittest.TestCase):
+    def test_sandra_intro_banner(self):
+        self.assertIn('id="introBackdrop"', HTML)
+        self.assertIn("Hello Sandra!", HTML)
+        self.assertIn("Because you have a respectful and loving husband", HTML)
+        self.assertIn("Start reviewing books", HTML)
+        self.assertIn('introContinueBtn.addEventListener("click"', HTML)
+
     def test_sample_photos_have_per_image_crop_specs(self):
         """Bundled photos must not be treated as five whole-photo cards."""
         marker = "const SAMPLE_BOOK_SPECS_BY_FILE = {"

@@ -144,6 +144,53 @@
 
     .btn:active { transform: translateY(1px); }
 
+    .intro-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.22), transparent 42%),
+        rgba(2, 6, 23, 0.92);
+      backdrop-filter: blur(10px);
+    }
+
+    .intro-backdrop.closed { display: none; }
+
+    .intro-card {
+      width: min(100%, 620px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: clamp(22px, 6vw, 38px);
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(8, 13, 24, 0.98));
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.58);
+      text-align: left;
+    }
+
+    .intro-card h1 {
+      margin: 0 0 14px;
+      font-size: clamp(1.9rem, 7vw, 3.1rem);
+      letter-spacing: -0.05em;
+      line-height: 0.96;
+    }
+
+    .intro-card p {
+      margin: 0;
+      color: rgba(248, 250, 252, 0.9);
+      font-size: clamp(1rem, 3.6vw, 1.24rem);
+      line-height: 1.55;
+    }
+
+    .intro-card .btn {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px 18px;
+      font-size: 1.05rem;
+    }
+
     .status {
       min-height: 1.25rem;
       font-size: 0.93rem;
@@ -538,6 +585,14 @@
   </style>
 </head>
 <body>
+  <div class="intro-backdrop" id="introBackdrop" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <section class="intro-card">
+      <h1 id="introTitle">Hello Sandra!</h1>
+      <p>Let me explain to you exactly what this is. Because you have a respectful and loving husband, instead of someone who would observe four of the same book and just make decisions on his own, this tool was created for you to browse through a selection of items and allow you to decide what we should keep and what we should not.</p>
+      <button class="btn primary" id="introContinueBtn" type="button">Start reviewing books</button>
+    </section>
+  </div>
+
   <div class="app">
     <header class="topbar">
       <div class="topbar-inner">
@@ -734,6 +789,8 @@
     };
 
     const els = {
+      introBackdrop: document.getElementById("introBackdrop"),
+      introContinueBtn: document.getElementById("introContinueBtn"),
       gallery: document.getElementById("gallery"),
       emptyState: document.getElementById("emptyState"),
       fileInput: document.getElementById("fileInput"),
@@ -1617,6 +1674,10 @@
       saveStorage();
       clearSharedStorage();
     }
+
+    els.introContinueBtn.addEventListener("click", () => {
+      els.introBackdrop.classList.add("closed");
+    });
 
     els.fileInput.addEventListener("change", async (ev) => {
       const input = ev.target;

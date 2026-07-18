@@ -40,12 +40,12 @@ class SampleSpecTests(unittest.TestCase):
         self.assertEqual(next(item for item in MANIFEST["items"] if item["id"] == "01-02")["title"], "My First Sticker by Numbers")
         self.assertEqual(next(item for item in MANIFEST["items"] if item["id"] == "01-02")["rotation"], 90)
 
-    def test_mobile_ui_is_compact_and_transparent_actions(self):
+    def test_mobile_ui_is_compact_and_solid_actions(self):
         self.assertIn(".topbar { position: static; }", HTML)
         self.assertIn(".title-wrap p { display: none; }", HTML)
         self.assertIn(".hint-box { display: none; }", HTML)
-        self.assertIn("border-color: rgba(34, 197, 94, 0.95);", HTML)
-        self.assertIn("border-color: rgba(239, 68, 68, 0.95);", HTML)
+        self.assertIn("background: linear-gradient(180deg, #22c55e, #16a34a);", HTML)
+        self.assertIn("background: linear-gradient(180deg, #ef4444, #dc2626);", HTML)
         self.assertNotIn("rotateBtn.style.background", HTML)
 
     def test_gallery_and_modal_decision_controls(self):

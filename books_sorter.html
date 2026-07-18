@@ -1416,17 +1416,53 @@
       }
     }
 
-    async function loadSampleSet() {
-      setStatus("Loading the sample photos…");
-      const files = [];
-      for (let i = 0; i < SAMPLE_IMAGES.length; i += 1) {
-        const response = await fetch(SAMPLE_IMAGES[i]);
-        if (!response.ok) throw new Error(`Sample image request failed (${response.status})`);
-        const blob = await response.blob();
-        const filename = `sample-${String(i + 1).padStart(2, "0")}.jpg`;
-        files.push(new File([blob], filename, { type: blob.type || "image/jpeg" }));
+    async function buildManifestGroups() {
+      const response = await fetch("/sample-crops/manifest.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`Sample crop manifest request failed (${response.status})`);
+      const manifest = await response.json();
+      const groups = [];
+      for (let i = 0; i < (manifest.items || []).length; i += 1) {
+        const item = manifest.items[i];
+        const img = await loadImage(item.src);
+        const canvas = imageToCanvas(img, 600);
+        const stats = componentStats(canvas, { minX: 0, minY: 0, maxX: canvas.width - 1, maxY: canvas.height - 1 });
+        const hash = averageHash(stats.crop);
+        const category = suggestCategory(stats);
+        groups.push({
+          id: i + 1,
+          hash,
+          crop: item.src,
+          aspectRatio: item.aspectRatio || (canvas.width / canvas.height),
+          count: 1,
+          sourceLabels: [item.source || "sample crop"],
+          category,
+          categoryLabel: CATEGORY_LABELS[category],
+          decision: null,
+          title: item.title || `Book ${String(i + 1).padStart(2, "0")}`,
+          rotation: item.rotation || 0,
+        });
       }
-      await processFiles(files);
+      applySavedState(groups);
+      return groups;
+    }
+
+    async function loadSampleSet() {
+      if (state.busy) return;
+      state.busy = true;
+      try {
+        setStatus("Loading generated book crops…");
+        const groups = await buildManifestGroups();
+        state.groups = groups;
+        state.groups.forEach((group, idx) => { group.id = idx + 1; });
+        state.nextId = state.groups.length + 1;
+        renderGallery();
+        setStatus(`Loaded ${state.groups.length} cropped book${state.groups.length === 1 ? "" : "s"}. Tap any card to enlarge it.`);
+      } catch (err) {
+        console.error(err);
+        setStatus(`Sample crops failed to load: ${err?.message || err}. Upload your own photos to continue.`);
+      } finally {
+        state.busy = false;
+      }
     }
 
     function clearStorage() {

@@ -1,9 +1,11 @@
+import json
 import re
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML = (ROOT / "books_sorter.html").read_text(encoding="utf-8")
+MANIFEST = json.loads((ROOT / "sample-crops" / "manifest.json").read_text(encoding="utf-8"))
 
 
 class SampleSpecTests(unittest.TestCase):
@@ -26,6 +28,14 @@ class SampleSpecTests(unittest.TestCase):
         self.assertNotIn('title: "Travel Puzzles", x: 275, y: 1075', HTML)
         self.assertNotIn('title: "Little Words", x: 485, y: 1075', HTML)
         self.assertNotIn('title: "Paper Mache", x: 720, y: 1080', HTML)
+
+    def test_floor_hue_generated_manifest_drives_sample_set(self):
+        self.assertIn('fetch("/sample-crops/manifest.json"', HTML)
+        self.assertIn('buildManifestGroups', HTML)
+        self.assertEqual(MANIFEST["generatedBy"], "floor-hue-segmentation-v1")
+        self.assertGreaterEqual(len(MANIFEST["items"]), 70)
+        self.assertTrue(all(item["src"].startswith("/sample-crops/") for item in MANIFEST["items"]))
+        self.assertGreaterEqual(min(item["fill"] for item in MANIFEST["items"]), 0.35)
 
     def test_mobile_ui_is_compact_and_transparent_actions(self):
         self.assertIn(".topbar { position: static; }", HTML)

@@ -1,0 +1,1055 @@
+{
+  "generatedBy": "floor-hue-segmentation-v1",
+  "items": [
+    {
+      "id": "01-01",
+      "title": "Photo 1 book 01",
+      "src": "/sample-crops/01/01.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        154,
+        42,
+        148,
+        95
+      ],
+      "fill": 0.378,
+      "aspectRatio": 1.5579,
+      "rotation": 0
+    },
+    {
+      "id": "01-02",
+      "title": "Photo 1 book 02",
+      "src": "/sample-crops/01/02.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        344,
+        41,
+        266,
+        212
+      ],
+      "fill": 0.778,
+      "aspectRatio": 1.2547,
+      "rotation": 0
+    },
+    {
+      "id": "01-03",
+      "title": "Photo 1 book 03",
+      "src": "/sample-crops/01/03.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        67,
+        126,
+        226,
+        124
+      ],
+      "fill": 0.521,
+      "aspectRatio": 1.8226,
+      "rotation": 0
+    },
+    {
+      "id": "01-04",
+      "title": "Photo 1 book 04",
+      "src": "/sample-crops/01/04.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        336,
+        298,
+        255,
+        209
+      ],
+      "fill": 0.549,
+      "aspectRatio": 1.2201,
+      "rotation": 0
+    },
+    {
+      "id": "01-05",
+      "title": "Photo 1 book 05",
+      "src": "/sample-crops/01/05.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        630,
+        298,
+        271,
+        209
+      ],
+      "fill": 0.752,
+      "aspectRatio": 1.2967,
+      "rotation": 0
+    },
+    {
+      "id": "01-06",
+      "title": "Photo 1 book 06",
+      "src": "/sample-crops/01/06.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        49,
+        520,
+        235,
+        212
+      ],
+      "fill": 0.584,
+      "aspectRatio": 1.1085,
+      "rotation": 0
+    },
+    {
+      "id": "01-07",
+      "title": "Photo 1 book 07",
+      "src": "/sample-crops/01/07.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        635,
+        600,
+        250,
+        176
+      ],
+      "fill": 0.633,
+      "aspectRatio": 1.4205,
+      "rotation": 0
+    },
+    {
+      "id": "01-08",
+      "title": "Photo 1 book 08",
+      "src": "/sample-crops/01/08.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        57,
+        764,
+        224,
+        204
+      ],
+      "fill": 0.661,
+      "aspectRatio": 1.098,
+      "rotation": 0
+    },
+    {
+      "id": "01-09",
+      "title": "Photo 1 book 09",
+      "src": "/sample-crops/01/09.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        346,
+        777,
+        258,
+        198
+      ],
+      "fill": 0.511,
+      "aspectRatio": 1.303,
+      "rotation": 0
+    },
+    {
+      "id": "01-10",
+      "title": "Photo 1 book 10",
+      "src": "/sample-crops/01/10.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        651,
+        836,
+        268,
+        208
+      ],
+      "fill": 0.765,
+      "aspectRatio": 1.2885,
+      "rotation": 0
+    },
+    {
+      "id": "01-11",
+      "title": "Photo 1 book 11",
+      "src": "/sample-crops/01/11.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        57,
+        1016,
+        220,
+        194
+      ],
+      "fill": 0.501,
+      "aspectRatio": 1.134,
+      "rotation": 0
+    },
+    {
+      "id": "01-12",
+      "title": "Photo 1 book 12",
+      "src": "/sample-crops/01/12.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        358,
+        1045,
+        245,
+        186
+      ],
+      "fill": 0.734,
+      "aspectRatio": 1.3172,
+      "rotation": 0
+    },
+    {
+      "id": "01-13",
+      "title": "Photo 1 book 13",
+      "src": "/sample-crops/01/13.jpg",
+      "source": "sample-01.jpg",
+      "box": [
+        890,
+        1168,
+        70,
+        112
+      ],
+      "fill": 0.749,
+      "aspectRatio": 0.625,
+      "rotation": 0
+    },
+    {
+      "id": "02-01",
+      "title": "Photo 2 book 01",
+      "src": "/sample-crops/02/01.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        248,
+        103,
+        190,
+        170
+      ],
+      "fill": 0.747,
+      "aspectRatio": 1.1176,
+      "rotation": 0
+    },
+    {
+      "id": "02-02",
+      "title": "Photo 2 book 02",
+      "src": "/sample-crops/02/02.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        44,
+        343,
+        184,
+        148
+      ],
+      "fill": 0.554,
+      "aspectRatio": 1.2432,
+      "rotation": 0
+    },
+    {
+      "id": "02-03",
+      "title": "Photo 2 book 03",
+      "src": "/sample-crops/02/03.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        249,
+        334,
+        191,
+        170
+      ],
+      "fill": 0.755,
+      "aspectRatio": 1.1235,
+      "rotation": 0
+    },
+    {
+      "id": "02-04",
+      "title": "Photo 2 book 04",
+      "src": "/sample-crops/02/04.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        472,
+        350,
+        209,
+        163
+      ],
+      "fill": 0.713,
+      "aspectRatio": 1.2822,
+      "rotation": 0
+    },
+    {
+      "id": "02-05",
+      "title": "Photo 2 book 05",
+      "src": "/sample-crops/02/05.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        702,
+        329,
+        229,
+        172
+      ],
+      "fill": 0.702,
+      "aspectRatio": 1.3314,
+      "rotation": 0
+    },
+    {
+      "id": "02-06",
+      "title": "Photo 2 book 06",
+      "src": "/sample-crops/02/06.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        36,
+        594,
+        181,
+        151
+      ],
+      "fill": 0.626,
+      "aspectRatio": 1.1987,
+      "rotation": 0
+    },
+    {
+      "id": "02-07",
+      "title": "Photo 2 book 07",
+      "src": "/sample-crops/02/07.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        243,
+        575,
+        189,
+        152
+      ],
+      "fill": 0.744,
+      "aspectRatio": 1.2434,
+      "rotation": 0
+    },
+    {
+      "id": "02-08",
+      "title": "Photo 2 book 08",
+      "src": "/sample-crops/02/08.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        440,
+        562,
+        203,
+        157
+      ],
+      "fill": 0.753,
+      "aspectRatio": 1.293,
+      "rotation": 0
+    },
+    {
+      "id": "02-09",
+      "title": "Photo 2 book 09",
+      "src": "/sample-crops/02/09.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        700,
+        580,
+        209,
+        158
+      ],
+      "fill": 0.491,
+      "aspectRatio": 1.3228,
+      "rotation": 0
+    },
+    {
+      "id": "02-10",
+      "title": "Photo 2 book 10",
+      "src": "/sample-crops/02/10.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        61,
+        804,
+        181,
+        152
+      ],
+      "fill": 0.721,
+      "aspectRatio": 1.1908,
+      "rotation": 0
+    },
+    {
+      "id": "02-11",
+      "title": "Photo 2 book 11",
+      "src": "/sample-crops/02/11.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        269,
+        792,
+        189,
+        159
+      ],
+      "fill": 0.638,
+      "aspectRatio": 1.1887,
+      "rotation": 0
+    },
+    {
+      "id": "02-12",
+      "title": "Photo 2 book 12",
+      "src": "/sample-crops/02/12.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        473,
+        785,
+        203,
+        162
+      ],
+      "fill": 0.528,
+      "aspectRatio": 1.2531,
+      "rotation": 0
+    },
+    {
+      "id": "02-13",
+      "title": "Photo 2 book 13",
+      "src": "/sample-crops/02/13.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        706,
+        799,
+        219,
+        166
+      ],
+      "fill": 0.486,
+      "aspectRatio": 1.3193,
+      "rotation": 0
+    },
+    {
+      "id": "02-14",
+      "title": "Photo 2 book 14",
+      "src": "/sample-crops/02/14.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        258,
+        972,
+        186,
+        169
+      ],
+      "fill": 0.593,
+      "aspectRatio": 1.1006,
+      "rotation": 0
+    },
+    {
+      "id": "02-15",
+      "title": "Photo 2 book 15",
+      "src": "/sample-crops/02/15.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        461,
+        986,
+        219,
+        170
+      ],
+      "fill": 0.746,
+      "aspectRatio": 1.2882,
+      "rotation": 0
+    },
+    {
+      "id": "02-16",
+      "title": "Photo 2 book 16",
+      "src": "/sample-crops/02/16.jpg",
+      "source": "sample-02.jpg",
+      "box": [
+        705,
+        996,
+        255,
+        222
+      ],
+      "fill": 0.422,
+      "aspectRatio": 1.1486,
+      "rotation": 0
+    },
+    {
+      "id": "03-01",
+      "title": "Photo 3 book 01",
+      "src": "/sample-crops/03/01.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        74,
+        96,
+        173,
+        131
+      ],
+      "fill": 0.449,
+      "aspectRatio": 1.3206,
+      "rotation": 0
+    },
+    {
+      "id": "03-02",
+      "title": "Photo 3 book 02",
+      "src": "/sample-crops/03/02.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        283,
+        48,
+        172,
+        152
+      ],
+      "fill": 0.382,
+      "aspectRatio": 1.1316,
+      "rotation": 0
+    },
+    {
+      "id": "03-03",
+      "title": "Photo 3 book 03",
+      "src": "/sample-crops/03/03.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        491,
+        53,
+        178,
+        145
+      ],
+      "fill": 0.521,
+      "aspectRatio": 1.2276,
+      "rotation": 0
+    },
+    {
+      "id": "03-04",
+      "title": "Photo 3 book 04",
+      "src": "/sample-crops/03/04.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        457,
+        150,
+        204,
+        309
+      ],
+      "fill": 0.55,
+      "aspectRatio": 0.6602,
+      "rotation": 0
+    },
+    {
+      "id": "03-05",
+      "title": "Photo 3 book 05",
+      "src": "/sample-crops/03/05.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        256,
+        244,
+        181,
+        217
+      ],
+      "fill": 0.602,
+      "aspectRatio": 0.8341,
+      "rotation": 0
+    },
+    {
+      "id": "03-06",
+      "title": "Photo 3 book 06",
+      "src": "/sample-crops/03/06.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        52,
+        246,
+        176,
+        207
+      ],
+      "fill": 0.571,
+      "aspectRatio": 0.8502,
+      "rotation": 0
+    },
+    {
+      "id": "03-07",
+      "title": "Photo 3 book 07",
+      "src": "/sample-crops/03/07.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        666,
+        396,
+        195,
+        284
+      ],
+      "fill": 0.514,
+      "aspectRatio": 0.6866,
+      "rotation": 0
+    },
+    {
+      "id": "03-08",
+      "title": "Photo 3 book 08",
+      "src": "/sample-crops/03/08.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        46,
+        459,
+        182,
+        221
+      ],
+      "fill": 0.806,
+      "aspectRatio": 0.8235,
+      "rotation": 0
+    },
+    {
+      "id": "03-09",
+      "title": "Photo 3 book 09",
+      "src": "/sample-crops/03/09.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        237,
+        473,
+        188,
+        224
+      ],
+      "fill": 0.762,
+      "aspectRatio": 0.8393,
+      "rotation": 0
+    },
+    {
+      "id": "03-10",
+      "title": "Photo 3 book 10",
+      "src": "/sample-crops/03/10.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        442,
+        467,
+        179,
+        220
+      ],
+      "fill": 0.8,
+      "aspectRatio": 0.8136,
+      "rotation": 0
+    },
+    {
+      "id": "03-11",
+      "title": "Photo 3 book 11",
+      "src": "/sample-crops/03/11.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        30,
+        682,
+        177,
+        213
+      ],
+      "fill": 0.753,
+      "aspectRatio": 0.831,
+      "rotation": 0
+    },
+    {
+      "id": "03-12",
+      "title": "Photo 3 book 12",
+      "src": "/sample-crops/03/12.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        220,
+        698,
+        176,
+        217
+      ],
+      "fill": 0.762,
+      "aspectRatio": 0.8111,
+      "rotation": 0
+    },
+    {
+      "id": "03-13",
+      "title": "Photo 3 book 13",
+      "src": "/sample-crops/03/13.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        436,
+        699,
+        183,
+        231
+      ],
+      "fill": 0.535,
+      "aspectRatio": 0.7922,
+      "rotation": 0
+    },
+    {
+      "id": "03-14",
+      "title": "Photo 3 book 14",
+      "src": "/sample-crops/03/14.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        650,
+        698,
+        190,
+        232
+      ],
+      "fill": 0.506,
+      "aspectRatio": 0.819,
+      "rotation": 0
+    },
+    {
+      "id": "03-15",
+      "title": "Photo 3 book 15",
+      "src": "/sample-crops/03/15.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        351,
+        944,
+        208,
+        261
+      ],
+      "fill": 0.658,
+      "aspectRatio": 0.7969,
+      "rotation": 0
+    },
+    {
+      "id": "03-16",
+      "title": "Photo 3 book 16",
+      "src": "/sample-crops/03/16.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        114,
+        958,
+        200,
+        249
+      ],
+      "fill": 0.784,
+      "aspectRatio": 0.8032,
+      "rotation": 0
+    },
+    {
+      "id": "03-17",
+      "title": "Photo 3 book 17",
+      "src": "/sample-crops/03/17.jpg",
+      "source": "sample-03.jpg",
+      "box": [
+        567,
+        970,
+        202,
+        260
+      ],
+      "fill": 0.709,
+      "aspectRatio": 0.7769,
+      "rotation": 0
+    },
+    {
+      "id": "04-01",
+      "title": "Photo 4 book 01",
+      "src": "/sample-crops/04/01.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        78,
+        75,
+        279,
+        226
+      ],
+      "fill": 0.628,
+      "aspectRatio": 1.2345,
+      "rotation": 0
+    },
+    {
+      "id": "04-02",
+      "title": "Photo 4 book 02",
+      "src": "/sample-crops/04/02.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        400,
+        39,
+        295,
+        241
+      ],
+      "fill": 0.702,
+      "aspectRatio": 1.2241,
+      "rotation": 0
+    },
+    {
+      "id": "04-03",
+      "title": "Photo 4 book 03",
+      "src": "/sample-crops/04/03.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        67,
+        366,
+        288,
+        239
+      ],
+      "fill": 0.772,
+      "aspectRatio": 1.205,
+      "rotation": 0
+    },
+    {
+      "id": "04-04",
+      "title": "Photo 4 book 04",
+      "src": "/sample-crops/04/04.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        424,
+        327,
+        289,
+        251
+      ],
+      "fill": 0.768,
+      "aspectRatio": 1.1514,
+      "rotation": 0
+    },
+    {
+      "id": "04-05",
+      "title": "Photo 4 book 05",
+      "src": "/sample-crops/04/05.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        104,
+        675,
+        278,
+        239
+      ],
+      "fill": 0.588,
+      "aspectRatio": 1.1632,
+      "rotation": 0
+    },
+    {
+      "id": "04-06",
+      "title": "Photo 4 book 06",
+      "src": "/sample-crops/04/06.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        460,
+        699,
+        300,
+        233
+      ],
+      "fill": 0.417,
+      "aspectRatio": 1.2876,
+      "rotation": 0
+    },
+    {
+      "id": "04-07",
+      "title": "Photo 4 book 07",
+      "src": "/sample-crops/04/07.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        124,
+        962,
+        273,
+        239
+      ],
+      "fill": 0.791,
+      "aspectRatio": 1.1423,
+      "rotation": 0
+    },
+    {
+      "id": "04-08",
+      "title": "Photo 4 book 08",
+      "src": "/sample-crops/04/08.jpg",
+      "source": "sample-04.jpg",
+      "box": [
+        480,
+        985,
+        267,
+        285
+      ],
+      "fill": 0.474,
+      "aspectRatio": 0.9368,
+      "rotation": 0
+    },
+    {
+      "id": "05-01",
+      "title": "Photo 5 book 01",
+      "src": "/sample-crops/05/01.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        210,
+        164,
+        212,
+        188
+      ],
+      "fill": 0.691,
+      "aspectRatio": 1.1277,
+      "rotation": 0
+    },
+    {
+      "id": "05-02",
+      "title": "Photo 5 book 02",
+      "src": "/sample-crops/05/02.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        466,
+        148,
+        235,
+        196
+      ],
+      "fill": 0.642,
+      "aspectRatio": 1.199,
+      "rotation": 0
+    },
+    {
+      "id": "05-03",
+      "title": "Photo 5 book 03",
+      "src": "/sample-crops/05/03.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        0,
+        188,
+        185,
+        181
+      ],
+      "fill": 0.739,
+      "aspectRatio": 1.0221,
+      "rotation": 0
+    },
+    {
+      "id": "05-04",
+      "title": "Photo 5 book 04",
+      "src": "/sample-crops/05/04.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        203,
+        371,
+        214,
+        178
+      ],
+      "fill": 0.636,
+      "aspectRatio": 1.2022,
+      "rotation": 0
+    },
+    {
+      "id": "05-05",
+      "title": "Photo 5 book 05",
+      "src": "/sample-crops/05/05.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        456,
+        376,
+        233,
+        184
+      ],
+      "fill": 0.627,
+      "aspectRatio": 1.2663,
+      "rotation": 0
+    },
+    {
+      "id": "05-06",
+      "title": "Photo 5 book 06",
+      "src": "/sample-crops/05/06.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        715,
+        468,
+        238,
+        198
+      ],
+      "fill": 0.485,
+      "aspectRatio": 1.202,
+      "rotation": 0
+    },
+    {
+      "id": "05-07",
+      "title": "Photo 5 book 07",
+      "src": "/sample-crops/05/07.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        0,
+        580,
+        196,
+        171
+      ],
+      "fill": 0.702,
+      "aspectRatio": 1.1462,
+      "rotation": 0
+    },
+    {
+      "id": "05-08",
+      "title": "Photo 5 book 08",
+      "src": "/sample-crops/05/08.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        196,
+        574,
+        220,
+        180
+      ],
+      "fill": 0.748,
+      "aspectRatio": 1.2222,
+      "rotation": 0
+    },
+    {
+      "id": "05-09",
+      "title": "Photo 5 book 09",
+      "src": "/sample-crops/05/09.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        450,
+        581,
+        233,
+        186
+      ],
+      "fill": 0.763,
+      "aspectRatio": 1.2527,
+      "rotation": 0
+    },
+    {
+      "id": "05-10",
+      "title": "Photo 5 book 10",
+      "src": "/sample-crops/05/10.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        0,
+        759,
+        198,
+        178
+      ],
+      "fill": 0.696,
+      "aspectRatio": 1.1124,
+      "rotation": 0
+    },
+    {
+      "id": "05-11",
+      "title": "Photo 5 book 11",
+      "src": "/sample-crops/05/11.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        214,
+        778,
+        210,
+        185
+      ],
+      "fill": 0.745,
+      "aspectRatio": 1.1351,
+      "rotation": 0
+    },
+    {
+      "id": "05-12",
+      "title": "Photo 5 book 12",
+      "src": "/sample-crops/05/12.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        455,
+        789,
+        232,
+        197
+      ],
+      "fill": 0.66,
+      "aspectRatio": 1.1777,
+      "rotation": 0
+    },
+    {
+      "id": "05-13",
+      "title": "Photo 5 book 13",
+      "src": "/sample-crops/05/13.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        720,
+        741,
+        236,
+        200
+      ],
+      "fill": 0.501,
+      "aspectRatio": 1.18,
+      "rotation": 0
+    },
+    {
+      "id": "05-14",
+      "title": "Photo 5 book 14",
+      "src": "/sample-crops/05/14.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        36,
+        978,
+        148,
+        164
+      ],
+      "fill": 0.464,
+      "aspectRatio": 0.9024,
+      "rotation": 0
+    },
+    {
+      "id": "05-15",
+      "title": "Photo 5 book 15",
+      "src": "/sample-crops/05/15.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        187,
+        996,
+        214,
+        181
+      ],
+      "fill": 0.443,
+      "aspectRatio": 1.1823,
+      "rotation": 0
+    },
+    {
+      "id": "05-16",
+      "title": "Photo 5 book 16",
+      "src": "/sample-crops/05/16.jpg",
+      "source": "sample-05.jpg",
+      "box": [
+        447,
+        1029,
+        233,
+        180
+      ],
+      "fill": 0.467,
+      "aspectRatio": 1.2944,
+      "rotation": 0
+    }
+  ]
+}

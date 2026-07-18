@@ -12,6 +12,7 @@ SECRET_PATH = "/books/4f8b2d7c"
 
 app = FastAPI(title="Book Sorter MVP")
 app.mount("/sample-images", StaticFiles(directory=APP_DIR / "sample-images"), name="sample-images")
+app.mount("/sample-crops", StaticFiles(directory=APP_DIR / "sample-crops"), name="sample-crops")
 
 
 @app.get("/", include_in_schema=False)

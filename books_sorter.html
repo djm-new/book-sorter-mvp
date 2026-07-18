@@ -520,28 +520,96 @@
       "/sample-images/05.jpg",
     ];
 
-    // Tight crops for the bundled sample photos so the gallery shows
-    // each individual book instead of the whole floor shot.
-    const SAMPLE_BOOK_SPECS = [
-      { title: "Fun Crafts for Kids", x: 108, y: 165, w: 188, h: 206, rotation: 90, pad: 4 },
-      { title: "Paper", x: 335, y: 72, w: 190, h: 220, rotation: 90, pad: 4 },
-      { title: "The Hardest Hidden Pictures Book Ever", x: 590, y: 24, w: 232, h: 214, rotation: 90, pad: 4 },
-      { title: "Elibird Activities", x: 74, y: 325, w: 238, h: 214, rotation: 0, pad: 4 },
-      { title: "Paper Mache", x: 315, y: 269, w: 230, h: 232, rotation: 0, pad: 4 },
-      { title: "My First Big Book of Activities", x: 563, y: 226, w: 246, h: 256, rotation: 90, pad: 4 },
-      { title: "Travel Puzzles", x: 76, y: 546, w: 232, h: 230, rotation: 90, pad: 4 },
-      { title: "Fun with Learning Numbers", x: 326, y: 544, w: 222, h: 232, rotation: 0, pad: 4 },
-      { title: "Summer Seuss Grades 1 & 2", x: 552, y: 532, w: 255, h: 252, rotation: 0, pad: 4 },
-      { title: "Reading Skills", x: 68, y: 800, w: 214, h: 226, rotation: 0, pad: 4 },
-      { title: "ABC", x: 326, y: 805, w: 222, h: 218, rotation: 0, pad: 4 },
-      { title: "Everyday Math", x: 556, y: 794, w: 260, h: 230, rotation: 0, pad: 4 },
-      { title: "Big Preschool ABC 1 2 3", x: 66, y: 987, w: 226, h: 214, rotation: 0, pad: 4 },
-      { title: "Numbers", x: 326, y: 975, w: 218, h: 214, rotation: 0, pad: 4 },
-      { title: "Little Learn First Words Alphabet", x: 572, y: 990, w: 248, h: 236, rotation: 0, pad: 4 },
-      { title: "My Stem Day Science", x: 56, y: 1120, w: 218, h: 160, rotation: 0, pad: 4 },
-      { title: "Numbers", x: 328, y: 1110, w: 218, h: 160, rotation: 0, pad: 4 },
-      { title: "How many frogs?", x: 582, y: 1120, w: 220, h: 160, rotation: 0, pad: 4 },
-    ];
+    // Hand-labeled crops for DJ's five supplied sample photos. These photos are
+    // intentionally treated as a calibrated review set: each spec is one book/item.
+    // Uploads still fall back to the heuristic detector below.
+    const SAMPLE_BOOK_SPECS_BY_FILE = {
+      "sample-01.jpg": [
+        { title: "Reusable Sticker Pad", x: 74, y: 50, w: 226, h: 210, rotation: 0, pad: 10 },
+        { title: "My First Sticker by Numbers", x: 355, y: 60, w: 250, h: 210, rotation: 0, pad: 10 },
+        { title: "Farm Reusable Sticker Pad", x: 58, y: 315, w: 220, h: 205, rotation: 0, pad: 10 },
+        { title: "Barbie Super Sticker Book", x: 345, y: 325, w: 248, h: 215, rotation: 0, pad: 10 },
+        { title: "American Girl Sticker Book", x: 650, y: 325, w: 255, h: 220, rotation: 0, pad: 10 },
+        { title: "Bugs Reusable Sticker Pad", x: 62, y: 580, w: 220, h: 205, rotation: 0, pad: 10 },
+        { title: "Pokemon Sticker Activity", x: 352, y: 595, w: 240, h: 205, rotation: 0, pad: 10 },
+        { title: "ABC Stickers", x: 650, y: 640, w: 250, h: 205, rotation: 0, pad: 10 },
+        { title: "Ocean Reusable Sticker Pad", x: 70, y: 830, w: 215, h: 205, rotation: 0, pad: 10 },
+        { title: "Jumbo Stickers Farm Animals", x: 350, y: 850, w: 245, h: 215, rotation: 0, pad: 10 },
+        { title: "Barbie Dress Up", x: 665, y: 875, w: 255, h: 225, rotation: 0, pad: 10 },
+        { title: "Baby Animals Sticker Pad", x: 74, y: 1085, w: 220, h: 205, rotation: 0, pad: 10 },
+        { title: "Painting Party", x: 365, y: 1105, w: 235, h: 170, rotation: 0, pad: 10 },
+      ],
+      "sample-02.jpg": [
+        { title: "My STEM Science", x: 70, y: 125, w: 150, h: 150, rotation: 0, pad: 10 },
+        { title: "Mila Mermaid", x: 255, y: 115, w: 185, h: 155, rotation: 0, pad: 10 },
+        { title: "Big Preschool", x: 55, y: 370, w: 165, h: 155, rotation: 0, pad: 10 },
+        { title: "Reading Skills Grade 1", x: 260, y: 365, w: 180, h: 160, rotation: 0, pad: 10 },
+        { title: "Everyday Math", x: 490, y: 385, w: 195, h: 155, rotation: 0, pad: 10 },
+        { title: "How Many Frogs", x: 720, y: 360, w: 220, h: 160, rotation: 0, pad: 10 },
+        { title: "Big Book of Activities", x: 55, y: 635, w: 155, h: 150, rotation: 0, pad: 10 },
+        { title: "Numbers 1 2 3", x: 250, y: 615, w: 195, h: 160, rotation: 0, pad: 10 },
+        { title: "Numbers 1 2 3", x: 455, y: 615, w: 195, h: 160, rotation: 0, pad: 10 },
+        { title: "Summer Seuss", x: 705, y: 630, w: 215, h: 150, rotation: 0, pad: 10 },
+        { title: "ABC Workbook", x: 70, y: 875, w: 170, h: 155, rotation: 0, pad: 10 },
+        { title: "Learning Numbers", x: 275, y: 875, w: 185, h: 145, rotation: 0, pad: 10 },
+        { title: "Paper Craft", x: 485, y: 845, w: 200, h: 165, rotation: 0, pad: 10 },
+        { title: "Hidden Pictures", x: 720, y: 855, w: 220, h: 165, rotation: 0, pad: 10 },
+        { title: "New York for Kids", x: 70, y: 1080, w: 165, h: 165, rotation: 0, pad: 10 },
+        { title: "Travel Puzzles", x: 275, y: 1075, w: 170, h: 165, rotation: 0, pad: 10 },
+        { title: "Little Words", x: 485, y: 1075, w: 200, h: 165, rotation: 0, pad: 10 },
+        { title: "Paper Mache", x: 720, y: 1080, w: 205, h: 165, rotation: 0, pad: 10 },
+      ],
+      "sample-03.jpg": [
+        { title: "Sticker Dress-Up Mermaids", x: 82, y: 45, w: 170, h: 190, rotation: 0, pad: 10 },
+        { title: "Sticker Dress-Up Sweeties", x: 290, y: 58, w: 165, h: 180, rotation: 0, pad: 10 },
+        { title: "Sticker Dress-Up Stick It", x: 505, y: 65, w: 170, h: 175, rotation: 0, pad: 10 },
+        { title: "Sticker Dress-Up Wicked Witches", x: 720, y: 82, w: 170, h: 195, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Ballerinas", x: 58, y: 275, w: 165, h: 185, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Ballerinas", x: 270, y: 285, w: 170, h: 180, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Ballerinas", x: 468, y: 285, w: 170, h: 180, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Ballerinas", x: 718, y: 295, w: 170, h: 185, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Mermaids", x: 54, y: 510, w: 170, h: 190, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Mermaids", x: 250, y: 525, w: 175, h: 190, rotation: 0, pad: 10 },
+        { title: "Sticker Dolly Dressing Mermaids", x: 455, y: 525, w: 175, h: 190, rotation: 0, pad: 10 },
+        { title: "Fairies Sticker Book", x: 680, y: 530, w: 175, h: 190, rotation: 0, pad: 10 },
+        { title: "Unicorns First Sticker Book", x: 38, y: 748, w: 175, h: 190, rotation: 0, pad: 10 },
+        { title: "Unicorns First Sticker Book", x: 238, y: 758, w: 175, h: 190, rotation: 0, pad: 10 },
+        { title: "Magic Kingdom", x: 452, y: 770, w: 175, h: 195, rotation: 0, pad: 10 },
+        { title: "Magic Kingdom", x: 662, y: 760, w: 180, h: 195, rotation: 0, pad: 10 },
+        { title: "Ice Skaters", x: 130, y: 1030, w: 180, h: 205, rotation: 0, pad: 10 },
+        { title: "Unicorns Sticker Dolly Dressing", x: 370, y: 1018, w: 180, h: 205, rotation: 0, pad: 10 },
+        { title: "Weddings Sticker Dolly Dressing", x: 600, y: 1035, w: 190, h: 205, rotation: 0, pad: 10 },
+      ],
+      "sample-04.jpg": [
+        { title: "Baby Animals Learn to Draw", x: 92, y: 88, w: 260, h: 215, rotation: 0, pad: 12 },
+        { title: "Sweet Scents Colorworld", x: 420, y: 60, w: 275, h: 245, rotation: 0, pad: 12 },
+        { title: "Too Cute Coloring", x: 78, y: 395, w: 270, h: 210, rotation: 0, pad: 12 },
+        { title: "Sweet Scents Colorworld", x: 435, y: 365, w: 290, h: 245, rotation: 0, pad: 12 },
+        { title: "Sparkle Dreams Twirl", x: 110, y: 735, w: 270, h: 220, rotation: 0, pad: 12 },
+        { title: "Magic Marbling Art", x: 465, y: 745, w: 305, h: 185, rotation: 180, pad: 12 },
+        { title: "All That Glitters", x: 112, y: 1045, w: 275, h: 230, rotation: 0, pad: 12 },
+        { title: "Pokemon Stained Glass Art", x: 495, y: 1058, w: 275, h: 220, rotation: 0, pad: 12 },
+      ],
+      "sample-05.jpg": [
+        { title: "Jumbo Stickers", x: 0, y: 210, w: 178, h: 160, rotation: 0, pad: 8 },
+        { title: "Jumbo Stickers", x: 205, y: 195, w: 220, h: 190, rotation: 0, pad: 10 },
+        { title: "Dora Jumbo Coloring", x: 485, y: 188, w: 210, h: 185, rotation: 0, pad: 10 },
+        { title: "Kawaii Cute", x: 28, y: 440, w: 145, h: 140, rotation: 0, pad: 8 },
+        { title: "Teacup Kittens", x: 215, y: 410, w: 205, h: 175, rotation: 0, pad: 10 },
+        { title: "Disney Princess Coloring", x: 465, y: 420, w: 230, h: 180, rotation: 0, pad: 10 },
+        { title: "Flowers Coloring Book", x: 735, y: 500, w: 225, h: 170, rotation: 0, pad: 10 },
+        { title: "Coloring Book", x: 0, y: 595, w: 190, h: 185, rotation: 0, pad: 8 },
+        { title: "How to Draw Manga Characters", x: 210, y: 600, w: 205, h: 175, rotation: 0, pad: 10 },
+        { title: "Imperfect Fruits", x: 465, y: 605, w: 220, h: 175, rotation: 0, pad: 10 },
+        { title: "Flowers Coloring Book", x: 735, y: 810, w: 220, h: 170, rotation: 0, pad: 10 },
+        { title: "Peppa Coloring", x: 16, y: 815, w: 165, h: 170, rotation: 0, pad: 8 },
+        { title: "Valentine Day Activity Book", x: 205, y: 815, w: 215, h: 185, rotation: 0, pad: 10 },
+        { title: "Teacup Kittens", x: 465, y: 820, w: 220, h: 180, rotation: 0, pad: 10 },
+        { title: "Coloring Book 3-4", x: 40, y: 1040, w: 150, h: 145, rotation: 0, pad: 8 },
+        { title: "Enchanting Coloring", x: 205, y: 1035, w: 220, h: 190, rotation: 0, pad: 10 },
+        { title: "Epic Book of Awesome", x: 455, y: 1038, w: 215, h: 205, rotation: 0, pad: 10 },
+      ],
+    };
 
     const state = {
       groups: [],
@@ -902,8 +970,13 @@
       return out;
     }
 
-    function buildSampleGroups(canvas) {
-      return SAMPLE_BOOK_SPECS.map((spec, idx) => {
+    function sampleSpecsForLabel(label) {
+      const normalized = (label || "").toLowerCase().split(/[\\/]/).pop();
+      return SAMPLE_BOOK_SPECS_BY_FILE[normalized] || null;
+    }
+
+    function buildSampleGroups(canvas, specs, label) {
+      return specs.map((spec, idx) => {
         const crop = cropRotatedRegion(canvas, spec);
         const stats = componentStats(crop, { minX: 0, minY: 0, maxX: crop.width - 1, maxY: crop.height - 1 });
         const hash = averageHash(stats.crop);
@@ -914,7 +987,7 @@
           crop: crop.toDataURL("image/jpeg", 0.9),
           aspectRatio: crop.width / crop.height,
           count: 1,
-          sourceLabels: ["sample photo"],
+          sourceLabels: [label || "sample photo"],
           category,
           categoryLabel: CATEGORY_LABELS[category],
           decision: null,
@@ -1194,8 +1267,10 @@
     async function analyzePhoto(source, label) {
       const img = typeof source === "string" ? await loadImage(source) : source;
       const canvas = imageToCanvas(img);
-      // Always run the real detector. The bundled sample photos are just inputs,
-      // not a special layout, so they should be segmented exactly like uploads.
+      const sampleSpecs = sampleSpecsForLabel(label);
+      if (sampleSpecs) {
+        return buildSampleGroups(canvas, sampleSpecs, label);
+      }
       const { mask, width, height } = createBinaryMask(canvas);
       const closed = closeMask(mask, width, height);
       let boxes = findComponents(closed, width, height);

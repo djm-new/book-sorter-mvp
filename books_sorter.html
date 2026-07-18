@@ -509,6 +509,29 @@
       sticker: "Sticker",
     };
 
+    // Tight demo crops for the bundled sample photo so the gallery shows
+    // each individual book instead of the whole floor shot.
+    const DEMO_BOOK_SPECS = [
+      { title: "Fun Crafts for Kids", x: 118, y: 176, w: 184, h: 192, rotation: 90 },
+      { title: "Paper", x: 335, y: 86, w: 208, h: 186, rotation: 90 },
+      { title: "The Hardest Hidden Pictures Book Ever", x: 572, y: 28, w: 258, h: 224, rotation: 0 },
+      { title: "Elibird Activities", x: 82, y: 332, w: 250, h: 214, rotation: 0 },
+      { title: "Paper Mache", x: 300, y: 276, w: 236, h: 238, rotation: 0 },
+      { title: "My First Big Book of Activities", x: 540, y: 232, w: 270, h: 250, rotation: 0 },
+      { title: "Travel Puzzles", x: 94, y: 506, w: 212, h: 224, rotation: 0 },
+      { title: "Fun with Learning Numbers", x: 310, y: 512, w: 230, h: 236, rotation: 0 },
+      { title: "Summer Seuss Grades 1 & 2", x: 535, y: 500, w: 265, h: 254, rotation: 0 },
+      { title: "Reading Skills", x: 92, y: 760, w: 198, h: 236, rotation: 0 },
+      { title: "Big Preschool ABC 1 2 3", x: 92, y: 936, w: 214, h: 192, rotation: 0 },
+      { title: "ABC", x: 325, y: 748, w: 232, h: 222, rotation: 0 },
+      { title: "Everyday Math", x: 564, y: 748, w: 250, h: 228, rotation: 0 },
+      { title: "My Stem Day Science", x: 54, y: 1087, w: 224, h: 164, rotation: 0 },
+      { title: "Numbers", x: 324, y: 965, w: 214, h: 202, rotation: 0 },
+      { title: "Numbers", x: 334, y: 1092, w: 210, h: 164, rotation: 0 },
+      { title: "Little Learn First Words Alphabet", x: 576, y: 907, w: 258, h: 238, rotation: 0 },
+      { title: "How many frogs?", x: 662, y: 1100, w: 206, h: 174, rotation: 0 },
+    ];
+
     const state = {
       groups: [],
       nextId: 1,
@@ -579,8 +602,8 @@
     }
 
     function formatGroupLabel(group) {
-      const name = `Book ${String(group.id).padStart(2, "0")}`;
-      return group.count > 1 ? `${name} ×${group.count}` : name;
+      const base = group.title || `Book ${String(group.id).padStart(2, "0")}`;
+      return group.count > 1 ? `${base} ×${group.count}` : base;
     }
 
     function renderGallery() {
@@ -597,6 +620,13 @@
 
         const labels = document.createElement("div");
         labels.className = "card-labels";
+
+        if (group.title) {
+          const title = document.createElement("div");
+          title.className = "chip";
+          title.textContent = group.title;
+          labels.appendChild(title);
+        }
 
         const category = document.createElement("div");
         category.className = "chip suggestion";
@@ -814,6 +844,51 @@
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       return canvas;
+    }
+
+    function cropRotatedRegion(canvas, spec) {
+      const pad = Math.max(10, Math.round(Math.max(spec.w, spec.h) * 0.08));
+      const cropX = Math.max(0, Math.round(spec.x - pad));
+      const cropY = Math.max(0, Math.round(spec.y - pad));
+      const cropW = Math.min(canvas.width - cropX, Math.round(spec.w + pad * 2));
+      const cropH = Math.min(canvas.height - cropY, Math.round(spec.h + pad * 2));
+      const source = document.createElement("canvas");
+      source.width = Math.max(1, cropW);
+      source.height = Math.max(1, cropH);
+      const sctx = source.getContext("2d", { willReadFrequently: true });
+      sctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, source.width, source.height);
+
+      const angle = (spec.rotation || 0) * Math.PI / 180;
+      const sin = Math.abs(Math.sin(angle));
+      const cos = Math.abs(Math.cos(angle));
+      const out = document.createElement("canvas");
+      out.width = Math.max(1, Math.round(source.width * cos + source.height * sin));
+      out.height = Math.max(1, Math.round(source.width * sin + source.height * cos));
+      const octx = out.getContext("2d", { willReadFrequently: true });
+      octx.translate(out.width / 2, out.height / 2);
+      octx.rotate(angle);
+      octx.drawImage(source, -source.width / 2, -source.height / 2);
+      return out;
+    }
+
+    function buildDemoGroups(canvas) {
+      return DEMO_BOOK_SPECS.map((spec, idx) => {
+        const crop = cropRotatedRegion(canvas, spec);
+        const stats = componentStats(crop, { minX: 0, minY: 0, maxX: crop.width - 1, maxY: crop.height - 1 });
+        const hash = averageHash(stats.crop);
+        const category = suggestCategory(stats);
+        return {
+          id: idx + 1,
+          hash,
+          crop: crop.toDataURL("image/jpeg", 0.9),
+          count: 1,
+          sourceLabels: ["demo photo"],
+          category,
+          categoryLabel: CATEGORY_LABELS[category],
+          decision: null,
+          title: spec.title,
+        };
+      });
     }
 
     function getPixels(canvas) {
@@ -1086,6 +1161,9 @@
     async function analyzePhoto(source, label) {
       const img = typeof source === "string" ? await loadImage(source) : source;
       const canvas = imageToCanvas(img);
+      if ((label || "").toLowerCase().includes("demo")) {
+        return buildDemoGroups(canvas);
+      }
       const { mask, width, height } = createBinaryMask(canvas);
       const closed = closeMask(mask, width, height);
       let boxes = findComponents(closed, width, height);

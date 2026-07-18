@@ -32,10 +32,13 @@ class SampleSpecTests(unittest.TestCase):
     def test_floor_hue_generated_manifest_drives_sample_set(self):
         self.assertIn('fetch("/sample-crops/manifest.json"', HTML)
         self.assertIn('buildManifestGroups', HTML)
-        self.assertEqual(MANIFEST["generatedBy"], "floor-hue-segmentation-v1")
-        self.assertGreaterEqual(len(MANIFEST["items"]), 70)
+        self.assertEqual(MANIFEST["generatedBy"], "floor-hue-segmentation-v1-title-rotation-overrides")
+        self.assertGreaterEqual(len(MANIFEST["items"]), 69)
         self.assertTrue(all(item["src"].startswith("/sample-crops/") for item in MANIFEST["items"]))
         self.assertGreaterEqual(min(item["fill"] for item in MANIFEST["items"]), 0.35)
+        self.assertNotIn("01-13", {item["id"] for item in MANIFEST["items"]})
+        self.assertEqual(next(item for item in MANIFEST["items"] if item["id"] == "01-02")["title"], "My First Sticker by Numbers")
+        self.assertEqual(next(item for item in MANIFEST["items"] if item["id"] == "01-02")["rotation"], 90)
 
     def test_mobile_ui_is_compact_and_transparent_actions(self):
         self.assertIn(".topbar { position: static; }", HTML)
@@ -44,6 +47,16 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn("border-color: rgba(34, 197, 94, 0.95);", HTML)
         self.assertIn("border-color: rgba(239, 68, 68, 0.95);", HTML)
         self.assertNotIn("rotateBtn.style.background", HTML)
+
+    def test_gallery_and_modal_decision_controls(self):
+        self.assertIn("border-radius: 50%;", HTML)
+        self.assertIn("aspect-ratio: 1 / 1;", HTML)
+        self.assertIn('id="modalImageKeepBtn"', HTML)
+        self.assertIn('id="modalImageDiscardBtn"', HTML)
+        self.assertIn("formatCategorySubtitle", HTML)
+        self.assertNotIn('rotateBtn.className = "icon-btn rotate"', HTML)
+        self.assertNotIn("rotate 0°", HTML)
+        self.assertNotIn("hash ${group.hash", HTML)
 
     def test_sample_labels_use_image_specific_specs_before_detector_fallback(self):
         self.assertIn("const sampleSpecs = sampleSpecsForLabel(label);", HTML)

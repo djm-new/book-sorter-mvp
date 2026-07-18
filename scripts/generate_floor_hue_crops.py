@@ -25,6 +25,80 @@ FILL_MIN = 0.35
 SPLIT_VALLEY_FRAC = 0.16
 PAD = 8
 
+TITLE_ROTATION_OVERRIDES = {
+    "01-01": ("Reusable Sticker Pad", 90),
+    "01-02": ("My First Sticker by Numbers", 90),
+    "01-03": ("Farm Reusable Sticker Pad", 90),
+    "01-04": ("Barbie Super Sticker Book", 90),
+    "01-05": ("American Girl Sticker Book", 0),
+    "01-06": ("Bugs Reusable Sticker Pad", 90),
+    "01-07": ("ABC Stickers", 90),
+    "01-08": ("Ocean Reusable Sticker Pad", 90),
+    "01-09": ("Jumbo Stickers Farm Animals", 90),
+    "01-10": ("Barbie Dress Up", 90),
+    "01-11": ("Baby Animals Sticker Pad", 90),
+    "01-12": ("Painting Party", 90),
+    "02-01": ("Mila Mermaid", 0),
+    "02-02": ("Big Preschool", 90),
+    "02-03": ("Reading Skills Grade 1", 0),
+    "02-04": ("Everyday Math", 0),
+    "02-05": ("How Many Frogs", 0),
+    "02-06": ("Big Book of Activities", 90),
+    "02-07": ("Numbers 1 2 3", 0),
+    "02-08": ("Numbers 1 2 3", 0),
+    "02-09": ("Summer Seuss", 90),
+    "02-10": ("ABC Workbook", 90),
+    "02-11": ("Learning Numbers", 90),
+    "02-12": ("Paper Craft", 90),
+    "02-13": ("Hidden Pictures", 90),
+    "02-14": ("Travel Puzzles", 90),
+    "02-15": ("Activity Book", 90),
+    "02-16": ("Paper Mache", 90),
+    "03-01": ("Sticker Dress-Up Mermaids", 0),
+    "03-02": ("Sticker Dress-Up Sweeties", 0),
+    "03-03": ("Sticker Dress-Up Stick It", 0),
+    "03-04": ("Sticker Dolly Dressing Ballerinas", 0),
+    "03-05": ("Sticker Dolly Dressing Ballerinas", 0),
+    "03-06": ("Sticker Dolly Dressing Ballerinas", 0),
+    "03-07": ("Fairies Sticker Book", 0),
+    "03-08": ("Sticker Dolly Dressing Mermaids", 0),
+    "03-09": ("Sticker Dolly Dressing Mermaids", 0),
+    "03-10": ("Sticker Dolly Dressing Mermaids", 0),
+    "03-11": ("Unicorns First Sticker Book", 0),
+    "03-12": ("Unicorns First Sticker Book", 0),
+    "03-13": ("Magic Kingdom", 0),
+    "03-14": ("Magic Kingdom", 0),
+    "03-15": ("Unicorns Sticker Dolly Dressing", 0),
+    "03-16": ("Ice Skaters", 0),
+    "03-17": ("Weddings Sticker Dolly Dressing", 0),
+    "04-01": ("Baby Animals Learn to Draw", 90),
+    "04-02": ("Sweet Scents Colorworld", 0),
+    "04-03": ("Too Cute Coloring", 0),
+    "04-04": ("Sweet Scents Colorworld", 0),
+    "04-05": ("Sparkle Dreams Twirl", 90),
+    "04-06": ("Magic Marbling Art", 0),
+    "04-07": ("All That Glitters", 90),
+    "04-08": ("Pokemon Stained Glass Art", 0),
+    "05-01": ("Jumbo Stickers", 90),
+    "05-02": ("Dora Jumbo Coloring", 0),
+    "05-03": ("Jumbo Stickers", 90),
+    "05-04": ("Teacup Kittens", 90),
+    "05-05": ("Disney Princess Coloring", 0),
+    "05-06": ("Flowers Coloring Book", 0),
+    "05-07": ("Coloring Book", 0),
+    "05-08": ("How to Draw Manga Characters", 180),
+    "05-09": ("Imperfect Fruits", 90),
+    "05-10": ("Peppa Coloring", 0),
+    "05-11": ("Valentine Day Activity Book", 90),
+    "05-12": ("Teacup Kittens", 90),
+    "05-13": ("Flowers Coloring Book", 0),
+    "05-14": ("Coloring Book 3-4", 0),
+    "05-15": ("Enchanting Coloring", 0),
+    "05-16": ("Epic Book of Awesome", 0),
+}
+
+INVALID_CROP_IDS = {"01-13"}
+
 
 def floor_inverse_mask(bgr: np.ndarray) -> np.ndarray:
     hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
@@ -188,27 +262,31 @@ def process_one(path: Path) -> list[dict]:
         old.unlink()
     items = []
     for idx, (x1, y1, x2, y2) in enumerate(boxes, 1):
+        item_id = f"{sample_name}-{idx:02d}"
+        if item_id in INVALID_CROP_IDS:
+            continue
         crop = bgr[y1:y2, x1:x2]
         out_name = f"{idx:02d}.jpg"
         out_path = sample_out / out_name
         cv2.imwrite(str(out_path), crop, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
         roi = mask[y1:y2, x1:x2]
+        title, rotation = TITLE_ROTATION_OVERRIDES.get(item_id, (f"Photo {int(sample_name)} book {idx:02d}", 0))
         items.append({
-            "id": f"{sample_name}-{idx:02d}",
-            "title": f"Photo {int(sample_name)} book {idx:02d}",
+            "id": item_id,
+            "title": title,
             "src": f"/sample-crops/{sample_name}/{out_name}",
             "source": f"sample-{sample_name}.jpg",
             "box": [int(x1), int(y1), int(x2 - x1), int(y2 - y1)],
             "fill": round(float(np.count_nonzero(roi)) / max(1, roi.size), 3),
             "aspectRatio": round((x2 - x1) / max(1, (y2 - y1)), 4),
-            "rotation": 0,
+            "rotation": rotation,
         })
     return items
 
 
 def main() -> None:
     OUT_DIR.mkdir(exist_ok=True)
-    manifest = {"generatedBy": "floor-hue-segmentation-v1", "items": []}
+    manifest = {"generatedBy": "floor-hue-segmentation-v1-title-rotation-overrides", "items": []}
     for src in sorted(SRC_DIR.glob("*.jpg")):
         items = process_one(src)
         print(src.name, len(items))

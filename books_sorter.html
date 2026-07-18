@@ -271,12 +271,34 @@
       pointer-events: none;
     }
 
+    .modal-image-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(2, 6, 23, 0.55);
+    }
+
+    .modal-image-wrap .decision-row {
+      top: 10px;
+      bottom: auto;
+      left: 10px;
+      right: 10px;
+      z-index: 2;
+    }
+
     .icon-btn {
       pointer-events: auto;
       width: 36px;
       height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      flex: 0 0 36px;
+      aspect-ratio: 1 / 1;
       border: 2px solid rgba(56, 189, 248, 0.9);
-      border-radius: 999px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
       font-size: 1rem;
@@ -389,9 +411,9 @@
       width: 100%;
       max-height: 58vh;
       object-fit: contain;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(2, 6, 23, 0.55);
+      border-radius: 0;
+      border: 0;
+      background: transparent;
     }
 
     .category-row {
@@ -453,7 +475,8 @@
       .hint-box { display: none; }
       .gallery { grid-template-columns: repeat(auto-fill, minmax(94px, 1fr)); gap: 8px; }
       .decision-row { left: 6px; right: 6px; bottom: 6px; gap: 6px; }
-      .icon-btn { width: 32px; height: 32px; font-size: 0.92rem; }
+      .icon-btn { width: 32px; height: 32px; min-width: 32px; min-height: 32px; flex-basis: 32px; font-size: 0.92rem; }
+      .modal-image-wrap .decision-row { top: 8px; left: 8px; right: 8px; }
       .category-row { grid-template-columns: 1fr; }
       .modal { border-radius: 22px; }
     }
@@ -520,14 +543,16 @@
         <button class="close-btn" id="closeModalBtn" type="button" aria-label="Close preview">×</button>
       </div>
       <div class="modal-body">
-        <img id="modalImage" class="modal-image" alt="Selected book crop" />
+        <div class="modal-image-wrap">
+          <img id="modalImage" class="modal-image" alt="Selected book crop" />
+          <div class="decision-row" aria-label="Book decision actions">
+            <button class="icon-btn keep" id="modalImageKeepBtn" type="button" aria-label="Mark keep">✓</button>
+            <button class="icon-btn discard" id="modalImageDiscardBtn" type="button" aria-label="Mark discard">✕</button>
+          </div>
+        </div>
         <div class="category-row" id="categoryRow"></div>
       </div>
       <div class="modal-footer">
-        <div class="footer-group">
-          <button class="btn" id="modalKeepBtn" type="button">Green check — keep</button>
-          <button class="btn" id="modalDiscardBtn" type="button">Red X — discard</button>
-        </div>
         <div class="footer-group">
           <button class="btn ghost" id="modalRotateLeftBtn" type="button">↺ Rotate left</button>
           <button class="btn ghost" id="modalRotateRightBtn" type="button">↻ Rotate right</button>
@@ -670,8 +695,8 @@
       modalSub: document.getElementById("modalSub"),
       modalImage: document.getElementById("modalImage"),
       categoryRow: document.getElementById("categoryRow"),
-      modalKeepBtn: document.getElementById("modalKeepBtn"),
-      modalDiscardBtn: document.getElementById("modalDiscardBtn"),
+      modalImageKeepBtn: document.getElementById("modalImageKeepBtn"),
+      modalImageDiscardBtn: document.getElementById("modalImageDiscardBtn"),
       modalRotateLeftBtn: document.getElementById("modalRotateLeftBtn"),
       modalRotateRightBtn: document.getElementById("modalRotateRightBtn"),
       modalBlankBtn: document.getElementById("modalBlankBtn"),
@@ -713,8 +738,13 @@
     }
 
     function formatGroupLabel(group) {
-      const base = group.title || `Book ${String(group.id).padStart(2, "0")}`;
+      const title = (group.title || "").trim();
+      const base = title && !/^photo\s+\d+\s+book\s+\d+$/i.test(title) ? title : "Untitled";
       return group.count > 1 ? `${base} ×${group.count}` : base;
+    }
+
+    function formatCategorySubtitle(group) {
+      return `Category: ${group.categoryLabel}`;
     }
 
     function renderGallery() {
@@ -772,16 +802,6 @@
         const actions = document.createElement("div");
         actions.className = "decision-row";
 
-        const rotateBtn = document.createElement("button");
-        rotateBtn.type = "button";
-        rotateBtn.className = "icon-btn rotate";
-        rotateBtn.textContent = "↻";
-        rotateBtn.setAttribute("aria-label", `Rotate ${formatGroupLabel(group)} clockwise`);
-        rotateBtn.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          rotateGroup(group.id, 90);
-        });
-
         const keepBtn = document.createElement("button");
         keepBtn.type = "button";
         keepBtn.className = "icon-btn keep";
@@ -802,7 +822,6 @@
           setDecision(group.id, "discard");
         });
 
-        actions.appendChild(rotateBtn);
         actions.appendChild(keepBtn);
         actions.appendChild(discardBtn);
         card.appendChild(actions);
@@ -823,7 +842,7 @@
       const group = currentGroup();
       if (!group) return;
       els.modalTitle.textContent = formatGroupLabel(group);
-      els.modalSub.textContent = `${group.categoryLabel} · ${group.decision ? group.decision : "undecided"} · rotate ${group.rotation || 0}° · hash ${group.hash.slice(0, 10)}`;
+      els.modalSub.textContent = formatCategorySubtitle(group);
       els.modalImage.src = group.crop;
       els.modalImage.style.transform = `rotate(${group.rotation || 0}deg)`;
       els.modalImage.style.transformOrigin = "center center";
@@ -855,8 +874,8 @@
         els.categoryRow.appendChild(button);
       });
 
-      els.modalKeepBtn.onclick = () => setDecision(group.id, "keep");
-      els.modalDiscardBtn.onclick = () => setDecision(group.id, "discard");
+      els.modalImageKeepBtn.onclick = () => setDecision(group.id, "keep");
+      els.modalImageDiscardBtn.onclick = () => setDecision(group.id, "discard");
       els.modalRotateLeftBtn.onclick = () => rotateGroup(group.id, -90);
       els.modalRotateRightBtn.onclick = () => rotateGroup(group.id, 90);
       els.modalBlankBtn.onclick = () => setDecision(group.id, null);

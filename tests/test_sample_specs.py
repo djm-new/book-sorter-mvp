@@ -21,6 +21,7 @@ class SampleSpecTests(unittest.TestCase):
         self.assertGreaterEqual(len(specs), 70)
 
     def test_known_wood_only_crops_are_removed(self):
+        self.assertNotIn('title: "ABC Workbook"', HTML)
         self.assertNotIn('title: "New York for Kids"', HTML)
         self.assertNotIn('title: "Travel Puzzles", x: 275, y: 1075', HTML)
         self.assertNotIn('title: "Little Words", x: 485, y: 1075', HTML)

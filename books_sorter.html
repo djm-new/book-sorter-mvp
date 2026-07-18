@@ -533,11 +533,11 @@
         { title: "Bugs Reusable Sticker Pad", x: 62, y: 580, w: 220, h: 205, rotation: 90, pad: 10 },
         { title: "Pokemon Sticker Activity", x: 352, y: 595, w: 240, h: 205, rotation: 0, pad: 10 },
         { title: "ABC Stickers", x: 650, y: 640, w: 250, h: 205, rotation: 0, pad: 10 },
-        { title: "Ocean Reusable Sticker Pad", x: 70, y: 830, w: 215, h: 205, rotation: 0, pad: 10 },
-        { title: "Jumbo Stickers Farm Animals", x: 350, y: 850, w: 245, h: 215, rotation: 0, pad: 10 },
+        { title: "Ocean Reusable Sticker Pad", x: 70, y: 830, w: 215, h: 170, rotation: 90, pad: 8 },
+        { title: "Jumbo Stickers Farm Animals", x: 350, y: 850, w: 245, h: 160, rotation: 90, pad: 8 },
         { title: "Barbie Dress Up", x: 665, y: 875, w: 255, h: 225, rotation: 90, pad: 10 },
         { title: "Baby Animals Sticker Pad", x: 74, y: 1085, w: 220, h: 205, rotation: 90, pad: 10 },
-        { title: "Painting Party", x: 365, y: 1105, w: 235, h: 170, rotation: 90, pad: 10 },
+        { title: "Painting Party", x: 365, y: 1105, w: 180, h: 170, rotation: 90, pad: 8 },
       ],
       "sample-02.jpg": [
         { title: "My STEM Science", x: 70, y: 125, w: 150, h: 150, rotation: 0, pad: 10 },
@@ -550,10 +550,9 @@
         { title: "Numbers 1 2 3", x: 250, y: 615, w: 195, h: 160, rotation: 0, pad: 10 },
         { title: "Numbers 1 2 3", x: 455, y: 615, w: 195, h: 160, rotation: 0, pad: 10 },
         { title: "Summer Seuss", x: 705, y: 630, w: 215, h: 150, rotation: 0, pad: 10 },
-        { title: "ABC Workbook", x: 70, y: 875, w: 170, h: 155, rotation: 0, pad: 10 },
-        { title: "Learning Numbers", x: 275, y: 875, w: 185, h: 145, rotation: 0, pad: 10 },
-        { title: "Paper Craft", x: 485, y: 845, w: 200, h: 165, rotation: 0, pad: 10 },
-        { title: "Hidden Pictures", x: 720, y: 855, w: 220, h: 165, rotation: 0, pad: 10 },
+        { title: "Learning Numbers", x: 275, y: 875, w: 185, h: 125, rotation: 90, pad: 8 },
+        { title: "Paper Craft", x: 485, y: 845, w: 200, h: 118, rotation: 90, pad: 8 },
+        { title: "Hidden Pictures", x: 720, y: 855, w: 220, h: 125, rotation: 90, pad: 8 },
       ],
       "sample-03.jpg": [
         { title: "Sticker Dress-Up Mermaids", x: 82, y: 45, w: 170, h: 190, rotation: 0, pad: 10 },
@@ -591,7 +590,7 @@
         { title: "Jumbo Stickers", x: 205, y: 195, w: 220, h: 190, rotation: 90, pad: 10 },
         { title: "Dora Jumbo Coloring", x: 485, y: 188, w: 210, h: 185, rotation: 0, pad: 10 },
         { title: "Kawaii Cute", x: 28, y: 440, w: 145, h: 140, rotation: 0, pad: 8 },
-        { title: "Teacup Kittens", x: 215, y: 410, w: 205, h: 175, rotation: 0, pad: 10 },
+        { title: "Teacup Kittens", x: 215, y: 410, w: 205, h: 175, rotation: 90, pad: 10 },
         { title: "Disney Princess Coloring", x: 465, y: 420, w: 230, h: 180, rotation: 0, pad: 10 },
         { title: "Flowers Coloring Book", x: 735, y: 500, w: 225, h: 170, rotation: 0, pad: 10 },
         { title: "Coloring Book", x: 0, y: 595, w: 190, h: 185, rotation: 0, pad: 8 },
@@ -600,7 +599,7 @@
         { title: "Flowers Coloring Book", x: 735, y: 810, w: 220, h: 170, rotation: 0, pad: 10 },
         { title: "Peppa Coloring", x: 16, y: 815, w: 165, h: 170, rotation: 0, pad: 8 },
         { title: "Valentine Day Activity Book", x: 205, y: 815, w: 215, h: 185, rotation: 0, pad: 10 },
-        { title: "Teacup Kittens", x: 465, y: 820, w: 220, h: 180, rotation: 0, pad: 10 },
+        { title: "Teacup Kittens", x: 465, y: 820, w: 220, h: 180, rotation: 90, pad: 10 },
         { title: "Coloring Book 3-4", x: 40, y: 1040, w: 150, h: 145, rotation: 0, pad: 8 },
         { title: "Enchanting Coloring", x: 205, y: 1035, w: 220, h: 190, rotation: 0, pad: 10 },
         { title: "Epic Book of Awesome", x: 455, y: 1038, w: 215, h: 205, rotation: 0, pad: 10 },
@@ -780,6 +779,8 @@
       els.modalTitle.textContent = formatGroupLabel(group);
       els.modalSub.textContent = `${group.categoryLabel} · ${group.decision ? group.decision : "undecided"} · rotate ${group.rotation || 0}° · hash ${group.hash.slice(0, 10)}`;
       els.modalImage.src = group.crop;
+      els.modalImage.style.transform = `rotate(${group.rotation || 0}deg)`;
+      els.modalImage.style.transformOrigin = "center center";
       els.modalBackdrop.classList.add("open");
       renderModalActions();
     }

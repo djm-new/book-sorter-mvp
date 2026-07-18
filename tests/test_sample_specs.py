@@ -20,6 +20,12 @@ class SampleSpecTests(unittest.TestCase):
         # regression guard against detecting only the five source photos.
         self.assertGreaterEqual(len(specs), 70)
 
+    def test_known_wood_only_crops_are_removed(self):
+        self.assertNotIn('title: "New York for Kids"', HTML)
+        self.assertNotIn('title: "Travel Puzzles", x: 275, y: 1075', HTML)
+        self.assertNotIn('title: "Little Words", x: 485, y: 1075', HTML)
+        self.assertNotIn('title: "Paper Mache", x: 720, y: 1080', HTML)
+
     def test_sample_labels_use_image_specific_specs_before_detector_fallback(self):
         self.assertIn("const sampleSpecs = sampleSpecsForLabel(label);", HTML)
         self.assertIn("if (sampleSpecs) {", HTML)

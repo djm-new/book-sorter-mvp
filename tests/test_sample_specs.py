@@ -27,6 +27,14 @@ class SampleSpecTests(unittest.TestCase):
         self.assertNotIn('title: "Little Words", x: 485, y: 1075', HTML)
         self.assertNotIn('title: "Paper Mache", x: 720, y: 1080', HTML)
 
+    def test_mobile_ui_is_compact_and_transparent_actions(self):
+        self.assertIn(".topbar { position: static; }", HTML)
+        self.assertIn(".title-wrap p { display: none; }", HTML)
+        self.assertIn(".hint-box { display: none; }", HTML)
+        self.assertIn("border-color: rgba(34, 197, 94, 0.95);", HTML)
+        self.assertIn("border-color: rgba(239, 68, 68, 0.95);", HTML)
+        self.assertNotIn("rotateBtn.style.background", HTML)
+
     def test_sample_labels_use_image_specific_specs_before_detector_fallback(self):
         self.assertIn("const sampleSpecs = sampleSpecsForLabel(label);", HTML)
         self.assertIn("if (sampleSpecs) {", HTML)

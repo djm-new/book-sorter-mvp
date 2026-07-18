@@ -230,6 +230,16 @@
     .overlay.keep { color: var(--green); background: rgba(34, 197, 94, 0.08); }
     .overlay.discard { color: var(--red); background: rgba(239, 68, 68, 0.08); }
 
+    .modal-decision-overlay {
+      display: none;
+      z-index: 1;
+    }
+
+    .modal-decision-overlay.keep,
+    .modal-decision-overlay.discard {
+      display: grid;
+    }
+
     .card-labels {
       position: absolute;
       inset: 8px 8px auto 8px;
@@ -279,6 +289,7 @@
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(2, 6, 23, 0.55);
+      touch-action: pan-y;
     }
 
     .modal-image-wrap .decision-row {
@@ -543,8 +554,9 @@
         <button class="close-btn" id="closeModalBtn" type="button" aria-label="Close preview">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-image-wrap">
+        <div class="modal-image-wrap" id="modalImageWrap">
           <img id="modalImage" class="modal-image" alt="Selected book crop" />
+          <div id="modalDecisionOverlay" class="overlay modal-decision-overlay" aria-hidden="true"></div>
           <div class="decision-row" aria-label="Book decision actions">
             <button class="icon-btn keep" id="modalImageKeepBtn" type="button" aria-label="Mark keep">✓</button>
             <button class="icon-btn discard" id="modalImageDiscardBtn" type="button" aria-label="Mark discard">✕</button>
@@ -693,7 +705,9 @@
       modalBackdrop: document.getElementById("modalBackdrop"),
       modalTitle: document.getElementById("modalTitle"),
       modalSub: document.getElementById("modalSub"),
+      modalImageWrap: document.getElementById("modalImageWrap"),
       modalImage: document.getElementById("modalImage"),
+      modalDecisionOverlay: document.getElementById("modalDecisionOverlay"),
       categoryRow: document.getElementById("categoryRow"),
       modalImageKeepBtn: document.getElementById("modalImageKeepBtn"),
       modalImageDiscardBtn: document.getElementById("modalImageDiscardBtn"),
@@ -846,6 +860,7 @@
       els.modalImage.src = group.crop;
       els.modalImage.style.transform = `rotate(${group.rotation || 0}deg)`;
       els.modalImage.style.transformOrigin = "center center";
+      renderModalDecisionOverlay(group);
       els.modalBackdrop.classList.add("open");
       renderModalActions();
     }
@@ -879,6 +894,23 @@
       els.modalRotateLeftBtn.onclick = () => rotateGroup(group.id, -90);
       els.modalRotateRightBtn.onclick = () => rotateGroup(group.id, 90);
       els.modalBlankBtn.onclick = () => setDecision(group.id, null);
+    }
+
+    function renderModalDecisionOverlay(group) {
+      els.modalDecisionOverlay.className = "overlay modal-decision-overlay";
+      els.modalDecisionOverlay.textContent = "";
+      if (group?.decision === "keep" || group?.decision === "discard") {
+        els.modalDecisionOverlay.classList.add(group.decision);
+        els.modalDecisionOverlay.textContent = group.decision === "keep" ? "✓" : "✕";
+      }
+    }
+
+    function navigateModal(delta) {
+      if (state.selectedId == null || !state.groups.length) return;
+      const idx = state.groups.findIndex((g) => g.id === state.selectedId);
+      if (idx < 0) return;
+      const next = state.groups[idx + delta];
+      if (next) openModal(next.id);
     }
 
     function persistGroup(group) {
@@ -1506,6 +1538,24 @@
     els.modalBackdrop.addEventListener("click", (ev) => {
       if (ev.target === els.modalBackdrop) closeModal();
     });
+
+    let modalTouchStart = null;
+    els.modalImageWrap.addEventListener("touchstart", (ev) => {
+      if (ev.target.closest("button")) return;
+      const touch = ev.changedTouches[0];
+      modalTouchStart = { x: touch.clientX, y: touch.clientY, at: Date.now() };
+    }, { passive: true });
+    els.modalImageWrap.addEventListener("touchend", (ev) => {
+      if (!modalTouchStart || ev.target.closest("button")) return;
+      const touch = ev.changedTouches[0];
+      const dx = touch.clientX - modalTouchStart.x;
+      const dy = touch.clientY - modalTouchStart.y;
+      const elapsed = Date.now() - modalTouchStart.at;
+      modalTouchStart = null;
+      if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.25 || elapsed > 900) return;
+      navigateModal(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
     document.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape") closeModal();
       if (ev.key === "ArrowLeft" && state.selectedId != null) {

@@ -53,10 +53,19 @@ class SampleSpecTests(unittest.TestCase):
         self.assertIn("aspect-ratio: 1 / 1;", HTML)
         self.assertIn('id="modalImageKeepBtn"', HTML)
         self.assertIn('id="modalImageDiscardBtn"', HTML)
+        self.assertIn('id="modalDecisionOverlay"', HTML)
         self.assertIn("formatCategorySubtitle", HTML)
+        self.assertIn("renderModalDecisionOverlay", HTML)
         self.assertNotIn('rotateBtn.className = "icon-btn rotate"', HTML)
         self.assertNotIn("rotate 0°", HTML)
         self.assertNotIn("hash ${group.hash", HTML)
+
+    def test_modal_swipe_navigation(self):
+        self.assertIn('id="modalImageWrap"', HTML)
+        self.assertIn('addEventListener("touchstart"', HTML)
+        self.assertIn('addEventListener("touchend"', HTML)
+        self.assertIn("function navigateModal(delta)", HTML)
+        self.assertIn("navigateModal(dx < 0 ? 1 : -1);", HTML)
 
     def test_sample_labels_use_image_specific_specs_before_detector_fallback(self):
         self.assertIn("const sampleSpecs = sampleSpecsForLabel(label);", HTML)
